@@ -1,0 +1,1576 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interaction Details Demo Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #17243d;
+      --muted: #5d677a;
+      --line: #dfe3ea;
+      --line-2: #eceff4;
+      --soft: #f5f7fb;
+      --soft-blue: #eef1ff;
+      --nav-blue: #244da8;
+      --accent: #244fb9;
+      --purple: #5d3d5e;
+      --green: #2f7d24;
+      --red: #d90a0a;
+      --teal: #1e7484;
+      --orange: #ff4f22;
+      --sidebar: 322px;
+      --participant: 258px;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: white; }
+    body { font-size: 14px; }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; }
+    .hidden { display: none !important; }
+    .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+
+    .app-shell { min-width: 1180px; background: #fff; }
+
+    /* Demo controls */
+    .demo-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      background: #17243d;
+      color: #fff;
+      border-bottom: 1px solid #0e1727;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .demo-controls strong { font-size: 13px; margin-right: 2px; }
+    .demo-controls select,
+    .demo-controls button {
+      height: 32px;
+      border-radius: 4px;
+      border: 1px solid #58657d;
+      background: #fff;
+      color: #17243d;
+      padding: 0 10px;
+      cursor: pointer;
+    }
+    .demo-controls select { min-width: 235px; }
+    .demo-controls button.primary { background: #315ec4; border-color: #315ec4; color: #fff; }
+    .demo-controls .spacer { flex: 1; }
+    .demo-controls .status { color: #ccd4e4; font-size: 12px; min-width: 96px; text-align: right; }
+    .demo-controls .presentation-hint { color: #b7c0d0; font-size: 12px; }
+
+    body.presentation .demo-controls { display: none; }
+    body.presentation .edit-only { display: none !important; }
+    body:not(.edit-mode) .edit-only { display: none !important; }
+    body.edit-mode [contenteditable="true"] { outline: 1px dashed #7d98d3; outline-offset: 2px; border-radius: 2px; }
+    body.edit-mode [contenteditable="true"]:focus { outline: 2px solid #315ec4; background: #fffef4; }
+
+    /* Top chrome */
+    .topbar {
+      height: 68px;
+      border-bottom: 1px solid #d7dde8;
+      display: flex;
+      align-items: center;
+      padding: 0 26px;
+      gap: 18px;
+      background: #fff;
+    }
+    .genesys-mark { width: 20px; height: 34px; position: relative; flex: 0 0 auto; }
+    .genesys-mark span { position:absolute; width: 11px; height: 11px; border-radius: 50%; background: var(--orange); }
+    .genesys-mark span:nth-child(1) { left: 5px; top: 0; }
+    .genesys-mark span:nth-child(2) { left: 0; top: 11px; }
+    .genesys-mark span:nth-child(3) { left: 5px; top: 22px; }
+    .menu-btn { height: 40px; padding: 0 14px; border: 1px solid #2857c7; background: #fff; color: #143b91; border-radius: 4px; display:flex; align-items:center; gap:8px; }
+    .global-search { width: 458px; height: 40px; border: 1px solid #9ea9bb; border-radius: 4px; display:flex; align-items:center; gap:10px; padding:0 14px; color:#687386; }
+    .search-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; position: relative; display:inline-block; }
+    .search-icon::after { content:""; position:absolute; width:7px; height:2px; background:currentColor; right:-5px; bottom:-2px; transform:rotate(45deg); border-radius:2px; }
+    .top-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
+    .top-action { height: 38px; border: 0; border-radius: 4px; background:#e8ebfc; color:#173e94; padding:0 12px; font-weight:600; display:flex; align-items:center; gap:7px; }
+    .queue-toggle { display:flex; align-items:center; gap:10px; font-weight:600; background:#eef0fc; height:38px; padding:0 12px; border-radius:4px; color:#173e94; }
+    .switch { width: 34px; height:18px; border-radius:10px; background:#dfe4eb; border:1px solid #9ba6b6; position:relative; }
+    .switch::after { content:""; width:14px; height:14px; border-radius:50%; background:#fff; position:absolute; top:1px; left:1px; box-shadow:0 1px 2px #888; }
+    .spark-btn { width:38px; height:38px; border-radius:4px; border:0; background:linear-gradient(135deg,#704bea,#ff814d); color:#fff; font-size:22px; }
+    .avatar-top { width:34px; height:34px; border-radius:50%; background:#122238; border:2px solid #2fae6b; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; }
+
+    .workspace-tabs { height: 50px; background:#f2f4f8; border-bottom:1px solid #d8dde7; display:flex; align-items:flex-end; padding-left:0; }
+    .workspace-tab { height:50px; min-width:180px; border-right:1px solid #d7dce6; display:flex; align-items:center; padding:0 15px; color:#394359; background:#f6f7fa; gap:10px; }
+    .workspace-tab.active { background:#fff; border-bottom:3px solid #244db5; }
+    .workspace-tab .dots { margin-left:auto; color:#1f4aa5; font-size:18px; }
+    .add-tab { width:50px; height:50px; border:0; background:#f6f7fa; color:#1f4aa5; font-size:26px; }
+    .interaction-strip { height: 47px; background:#f1f2f8; border-bottom:1px solid #d8dde7; display:flex; align-items:center; padding:0 24px; color:#445168; }
+    .phone-glyph { font-size:18px; margin-right:12px; }
+    .interaction-id { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px; }
+    .copy-mini { margin-left:15px; border:0; background:transparent; color:#244fb9; font-size:18px; cursor:pointer; }
+    .last-updated { margin-left:auto; display:flex; align-items:center; gap:16px; }
+
+    /* Recording area */
+    .recording-area { display:grid; grid-template-columns: var(--participant) minmax(0,1fr); border-bottom:1px solid #e3e6ec; min-height: 380px; }
+    .participant-panel { padding: 12px 18px 10px; background:#fff; }
+    .part-card { background:#f0f1f6; border-bottom:6px solid #fff; padding:14px 18px; min-height:54px; }
+    .part-card .heading { text-transform:uppercase; font-weight:700; font-size:13px; color:#293247; margin-bottom:12px; }
+    .part-row { display:flex; align-items:center; gap:10px; line-height:1.4; }
+    .part-row + .part-row { margin-top:6px; }
+    .part-row strong { color:#17409a; }
+    .score-pill { margin-top:6px; display:flex; align-items:center; gap:9px; }
+    .score-pill .score { color:#244fb9; font-weight:700; }
+    .trend { background:#368c2c; color:white; border-radius:4px; padding:3px 9px; font-weight:700; font-size:12px; }
+
+    .record-main { padding: 18px 24px 10px 12px; min-width:0; }
+    .record-meta { display:grid; grid-template-columns: 1fr 1fr 1fr; align-items:start; margin-bottom:16px; }
+    .meta-block { display:flex; gap:10px; }
+    .meta-icon { font-size:29px; line-height:1; color:#111c2c; }
+    .meta-title { font-size:12px; font-weight:800; letter-spacing:.02em; color:#646e7f; }
+    .meta-value { margin-top:4px; font-size:13px; color:#20293a; }
+    .meta-center { text-align:center; }
+    .meta-right { text-align:right; }
+
+    .wave-wrap { display:grid; grid-template-columns: minmax(0,1fr) 174px; gap:18px; align-items:center; }
+    .wave-area { position:relative; height:150px; overflow:visible; }
+    .waveform { height:110px; position:absolute; left:0; right:0; top:18px; display:flex; align-items:center; gap:2px; border-bottom:1px solid #707987; }
+    .wave-bar { flex:1 1 auto; min-width:1px; background:#c9ced4; opacity:.95; transform-origin:center; }
+    .marker-layer { position:absolute; left:0; right:0; top:60px; height:42px; z-index:4; }
+    .timeline-marker { position:absolute; top:0; width:23px; height:23px; margin-left:-11px; border-radius:50%; background:var(--purple); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.04); cursor:pointer; user-select:none; touch-action:none; }
+    .timeline-marker.positive, .timeline-marker.empathy { background:var(--green); }
+    .timeline-marker.negative, .timeline-marker.unhelpful { background:var(--red); }
+    .timeline-marker.annotation { background:var(--teal); }
+    .timeline-marker.active { transform:scale(1.18); box-shadow:0 0 0 3px rgba(48,95,196,.18); }
+    .progress-bar { position:absolute; left:0; right:0; bottom:0; height:10px; border:1px solid #b8c0cb; border-radius:7px; background:#fff; overflow:hidden; }
+    .progress-fill { height:100%; width:38%; background:#8ca5ba; border-radius:7px; }
+    .playhead { position:absolute; top:14px; bottom:9px; width:2px; background:#244fb9; z-index:3; opacity:.5; pointer-events:none; }
+
+    .play-controls { height:130px; display:flex; align-items:center; justify-content:center; gap:16px; color:#244fb9; }
+    .play-btn { width:72px; height:72px; border-radius:50%; border:0; background:#244fb9; color:#fff; font-size:0; cursor:pointer; position:relative; }
+    .play-btn::after { content:""; position:absolute; left:29px; top:22px; border-left:23px solid #fff; border-top:14px solid transparent; border-bottom:14px solid transparent; }
+    .play-btn.playing::after { border:0; left:26px; top:22px; width:8px; height:28px; background:#fff; box-shadow:16px 0 0 #fff; }
+    .vol { font-size:25px; }
+    .speed { color:#202b3e; }
+    .vertical-slider { width:4px; height:72px; background:#244fb9; border-radius:3px; position:relative; }
+    .vertical-slider::after { content:""; width:24px; height:5px; background:#244fb9; position:absolute; left:-10px; top:36px; border-radius:4px; }
+
+    .annotation-row { display:flex; align-items:center; gap:10px; margin-top:8px; }
+    .annotation-input { height:38px; flex:0 1 510px; border:1px solid #98a4b6; border-radius:4px; display:flex; align-items:center; gap:10px; padding:0 12px; color:#687386; }
+    .annotation-input input { border:0; outline:0; width:100%; background:transparent; }
+    .annotate-btn { height:38px; border:0; border-radius:4px; padding:0 16px; background:#e6e9fa; color:#8898cf; font-weight:700; cursor:pointer; }
+    .page-nav { display:flex; align-items:center; justify-content:center; gap:15px; margin:22px 0 0; }
+    .page-nav button { width:40px; height:40px; border:0; background:#e9ecfb; color:#8ba0d9; border-radius:4px; font-size:22px; cursor:pointer; }
+
+    /* Detail tabs */
+    .detail-tabs { height:60px; display:flex; align-items:flex-end; gap:28px; padding:0 34px; border-bottom:1px solid #d9dde6; position:relative; }
+    .detail-tab { height:48px; border:0; background:transparent; padding:0; color:#273246; cursor:pointer; border-bottom:3px solid transparent; }
+    .detail-tab.active { border-bottom-color:#244fb9; }
+    .schedule-btn { margin-left:auto; align-self:center; height:40px; background:#dfe5fb; color:#244da8; border:0; border-radius:4px; font-weight:700; padding:0 16px; cursor:pointer; }
+
+    /* Interaction panel */
+    .interaction-view { margin:0 18px 18px; border:1px solid #d8dde6; display:grid; grid-template-columns:minmax(0,1fr) var(--sidebar); min-height:540px; background:#fff; }
+    .transcript-pane { min-width:0; border-right:1px solid #d8dde6; display:flex; flex-direction:column; }
+    .transcript-toolbar { height:80px; display:flex; align-items:center; gap:20px; padding:0 24px; border-bottom:1px solid #e1e4ea; flex:0 0 auto; }
+    .lock { font-size:24px; color:#1f55c4; }
+    .transcript-search { width:382px; height:38px; border:1px solid #8d99aa; border-radius:4px; display:flex; align-items:center; gap:10px; padding:0 13px; }
+    .transcript-search input { flex:1; border:0; outline:0; }
+    .toolbar-spacer { flex:1; }
+    .ai-outline { display:flex; align-items:center; gap:10px; color:#42506a; font-size:13px; }
+    .mini-toggle { width:32px; height:17px; border-radius:10px; background:#e4e7ec; position:relative; cursor:pointer; border:0; }
+    .mini-toggle::after { content:""; position:absolute; width:13px; height:13px; border-radius:50%; left:2px; top:2px; background:#fff; border:2px solid #244fb9; }
+    .mini-toggle.on { background:#dce5ff; }
+    .mini-toggle.on::after { left:17px; background:#244fb9; border-color:#244fb9; }
+    .tool-icon { width:36px; height:36px; border:0; background:transparent; font-size:20px; color:#45536b; cursor:pointer; }
+
+    .transcript-scroller { height:520px; overflow-y:auto; overflow-x:hidden; position:relative; scroll-behavior:smooth; }
+    .action-separator { display:flex; align-items:center; gap:8px; padding:16px 18px 6px; color:#2c3648; }
+    .action-line { height:1px; background:#cfd5de; flex:1; }
+    .action-chip { background:#e8ecf3; border-radius:3px; padding:8px 18px; font-weight:700; font-size:12px; white-space:nowrap; }
+    .multi-actions { display:flex; align-items:center; gap:8px; padding:8px 70px 12px 110px; }
+    .multi-actions .action-chip { padding:7px 14px; }
+    .transcript-entry { min-height:54px; display:grid; grid-template-columns:72px 40px minmax(0,1fr); column-gap:10px; align-items:start; padding:10px 24px; border-left:3px solid transparent; position:relative; }
+    .transcript-entry.customer { background:#f6f7f9; }
+    .transcript-entry.flash { animation:flash .9s ease-out; border-left-color:#315ec4; }
+    @keyframes flash { 0%{ background:#fff2b8;} 100%{} }
+    .ts { font-weight:700; color:#26344c; padding-top:4px; }
+    .speaker-icon { width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:50%; color:#173e91; border:2px solid #173e91; margin-top:0; font-size:13px; font-weight:700; }
+    .speaker-icon.bot { border-color:#76a5ff; color:#6099ff; border-radius:7px; }
+    .speaker-icon.agent { border:0; background:#173e91; color:#fff; }
+    .phrase { color:#2f3848; line-height:1.56; min-width:0; }
+    .topic-badge { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--purple); color:#fff; font-weight:800; font-size:11px; margin-right:5px; vertical-align:middle; cursor:pointer; }
+    .event-inline { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; color:#fff; font-weight:800; font-size:11px; margin-right:5px; vertical-align:middle; cursor:pointer; }
+    .event-inline.negative,.event-inline.unhelpful { background:var(--red); }
+    .event-inline.positive,.event-inline.empathy { background:var(--green); }
+    .event-inline.annotation { background:var(--teal); }
+    .highlight-topic { text-decoration: underline; text-decoration-color:rgba(93,61,94,.5); text-decoration-thickness:2px; text-underline-offset:3px; }
+    .outline-off .highlight-topic { text-decoration:none; }
+    .row-edit { grid-column:3; margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .row-edit input, .row-edit select { height:30px; border:1px solid #a8b0be; border-radius:3px; padding:0 7px; }
+    .tiny-btn { height:30px; border:1px solid #9ba5b4; background:#fff; border-radius:3px; padding:0 9px; cursor:pointer; }
+    .tiny-btn.danger { color:#b20c0c; border-color:#e2a2a2; }
+    .add-transcript { display:block; margin:14px auto 18px; height:34px; border:1px solid #8d9ab0; background:#fff; border-radius:4px; padding:0 12px; cursor:pointer; }
+
+    /* Right side panel */
+    .sidepanel { min-width:0; display:flex; flex-direction:column; background:#fff; }
+    .side-tabs { height:62px; display:flex; align-items:flex-end; gap:26px; padding:0 16px; border-bottom:1px solid #e1e4ea; flex:0 0 auto; }
+    .side-tab { border:0; background:transparent; padding:0 0 10px; font-weight:800; cursor:pointer; border-bottom:3px solid transparent; }
+    .side-tab.active { border-bottom-color:#244fb9; }
+    .side-scroll { height:538px; overflow-y:auto; padding:0 16px 22px; }
+    .ai-label { display:inline-flex; align-items:center; gap:5px; margin:12px 0 12px; padding:3px 8px; border-radius:2px; background:#cff4f4; color:#17243d; font-weight:800; font-size:12px; }
+    .virtual-agent { background:#f0f0f0; margin:0 -2px 12px; padding:13px 10px; color:#596273; }
+    .insight-block { padding:0 0 18px; }
+    .insight-heading { font-weight:800; margin-bottom:8px; color:#111c2c; }
+    .insight-subheading { font-weight:800; margin:10px 0 5px; color:#17243d; }
+    .insight-text { line-height:1.45; color:#252e3e; }
+    .clamped { display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+    .show-more { display:inline-block; margin-top:5px; border:0; padding:0; background:transparent; color:#1851bd; font-weight:800; cursor:pointer; }
+    .divider { height:1px; background:#e1e5eb; margin:2px 0 14px; }
+    .sentiment-item { padding:7px 0 11px; }
+    .sentiment-title { display:flex; align-items:center; gap:7px; font-weight:800; }
+    .sentiment-dot { width:18px; height:18px; border-radius:50%; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:11px; }
+    .sentiment-dot.positive { background:var(--green); }
+    .sentiment-dot.negative { background:var(--red); }
+    .agent-summary { border-top:1px solid #e0e4ea; padding:12px 0; }
+    .agent-summary details > summary { cursor:pointer; font-weight:800; list-style:none; }
+    .agent-summary details > summary::-webkit-details-marker { display:none; }
+    .ai-generated { display:inline-flex; align-items:center; margin-top:8px; font-size:12px; background:#eaf5f3; padding:3px 7px; border-radius:2px; font-weight:700; }
+
+    .event-filters { display:flex; gap:15px; flex-wrap:wrap; margin:11px 0 6px; align-items:flex-end; }
+    .filter-btn { border:0; background:transparent; padding:0 0 8px; font-weight:800; border-bottom:3px solid currentColor; cursor:pointer; }
+    .filter-btn.off { opacity:.35; border-bottom-color:#c7ccd4 !important; }
+    .filter-btn.topics { color:var(--purple); }
+    .filter-btn.positive,.filter-btn.empathy { color:var(--green); }
+    .filter-btn.negative,.filter-btn.unhelpful { color:var(--red); }
+    .event-list { margin-top:3px; }
+    .event-row { min-height:40px; display:grid; grid-template-columns:26px minmax(0,1fr) 52px; gap:8px; align-items:center; padding:2px 0; cursor:pointer; }
+    .event-row:hover { background:#f7f8fa; }
+    .event-icon { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:800; background:var(--purple); }
+    .event-icon.positive,.event-icon.empathy { background:var(--green); }
+    .event-icon.negative,.event-icon.unhelpful { background:var(--red); }
+    .event-icon.annotation { background:var(--teal); }
+    .event-label { color:#1755c5; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .event-time { text-align:right; font-weight:700; color:#141c2b; }
+    .event-edit { grid-column:1 / -1; display:grid; grid-template-columns:1fr 120px 74px auto; gap:6px; padding:4px 0 8px; }
+    .event-edit input,.event-edit select { min-width:0; height:30px; border:1px solid #a5afbe; border-radius:3px; padding:0 6px; }
+    .add-event { margin:10px 0; width:100%; height:34px; border:1px solid #92a0b4; background:#fff; border-radius:4px; cursor:pointer; }
+
+    .placeholder { padding:45px; color:#5f6978; }
+    .placeholder h3 { margin:0 0 10px; color:#26344c; }
+
+    .toast { position:fixed; right:22px; bottom:22px; background:#17243d; color:#fff; border-radius:5px; padding:11px 14px; box-shadow:0 5px 20px rgba(0,0,0,.25); opacity:0; transform:translateY(10px); pointer-events:none; transition:.18s ease; z-index:999; }
+    .toast.show { opacity:1; transform:translateY(0); }
+
+    @media (max-width: 1300px) {
+      :root { --sidebar: 300px; --participant: 230px; }
+      .global-search { width:330px; }
+      .top-action { padding:0 9px; }
+    }
+
+
+    /* High-fidelity Genesys chrome refinements */
+    :root {
+      --sidebar: 510px;
+      --participant: 248px;
+      font-family: "Roboto", Arial, sans-serif;
+    }
+    html, body, button, input, select, textarea { font-family: "Roboto", Arial, sans-serif; }
+    .app-shell { min-width: 1500px; }
+    .topbar {
+      height: 72px;
+      padding: 0 18px;
+      gap: 14px;
+      border-top: 4px solid #344744;
+      border-bottom: 1px solid #d9dde5;
+    }
+    .genesys-mark { display:none; }
+    .genesys-logo { width: 22px; height: 36px; object-fit: contain; flex: 0 0 auto; }
+    .menu-btn { height: 36px; min-width: 74px; padding:0 10px; border-color:#2352bb; border-radius:3px; font-weight:400; color:#23499f; }
+    .menu-icon,.nav-icon,.participant-mini-icon,.participant-main-icon,.chevron-icon,.external-icon,.info-icon,.headset-avatar svg { fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .menu-icon { width:14px; height:14px; }
+    .global-search { width: 372px; height: 36px; border-color:#aab2c0; padding:0 13px; font-size:13px; }
+    .top-actions { gap: 12px; white-space:nowrap; }
+    .top-action {
+      height: 36px;
+      border-radius: 4px;
+      background:#d5d8f2;
+      color:#23499f;
+      padding:0 11px;
+      font-size:15px;
+      line-height:1;
+      font-weight:700;
+      gap:8px;
+      position:relative;
+    }
+    .top-action:hover,.top-action:focus-visible { background:#cbd0ef; }
+    .nav-icon { width:20px; height:20px; flex:0 0 auto; }
+    .apps-icon { stroke-width:2.2; }
+    .workspace-action { padding-right:14px; }
+    .inbox-badge {
+      position:absolute;
+      right:-8px;
+      top:-10px;
+      width:26px;
+      height:26px;
+      border-radius:50%;
+      background:#df2f48;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:13px;
+      font-weight:700;
+    }
+    .queue-toggle {
+      height:36px;
+      padding:0 11px;
+      gap:9px;
+      border:0;
+      border-radius:4px;
+      background:#eef1fb;
+      color:#23499f;
+      font-size:15px;
+      font-weight:700;
+    }
+    .switch { width:36px; height:20px; border:0; background:#c8cfdf; }
+    .switch::after { width:18px; height:18px; top:1px; left:1px; border:2px solid #23499f; box-shadow:none; }
+    .spark-btn {
+      width:36px;
+      height:36px;
+      border-radius:5px;
+      border:1px solid #ff781f;
+      background:linear-gradient(135deg,#ff7847 0%,#ffb67d 48%,#7089d9 100%);
+      box-shadow:0 2px 7px rgba(255,120,31,.38);
+      padding:7px;
+    }
+    .spark-btn svg { width:100%; height:100%; fill:#fff; stroke:#fff; stroke-width:.2; }
+    .avatar-button { width:38px; height:38px; padding:0; border:0; border-radius:50%; background:transparent; position:relative; }
+    .avatar-button img { width:38px; height:38px; display:block; border-radius:50%; }
+    .participant-panel { padding:12px 0 10px; background:#fff; position:relative; overflow:visible; }
+    .part-card { background:#f0f1f6; padding:14px 24px; border-bottom:6px solid #fff; }
+    .transfer-card { padding-top:12px; padding-bottom:12px; min-height:48px; }
+    .transfer-row { color:#445168; font-size:13px; gap:9px; }
+    .participant-mini-icon { width:17px; height:17px; color:#2452b3; }
+    .internal-card { min-height:102px; position:relative; padding-top:14px; overflow:visible; }
+    .participant-heading,.participant-heading-button {
+      display:block;
+      margin:0 0 12px;
+      padding:0;
+      border:0;
+      background:transparent;
+      color:#282d39;
+      text-transform:uppercase;
+      font-size:16px;
+      line-height:1;
+      font-weight:700;
+      letter-spacing:.01em;
+    }
+    .participant-heading-button { cursor:pointer; }
+    .internal-trigger { display:flex; align-items:center; gap:9px; padding:0; border:0; background:transparent; color:#173b83; cursor:pointer; }
+    .participant-main-icon { width:22px; height:22px; }
+    .internal-link { color:#173b83; font-size:16px; font-weight:700; text-decoration:underline; text-underline-offset:2px; }
+    .chevron-icon { width:18px; height:18px; stroke-width:2.5; }
+    .participant-popup {
+      position:absolute;
+      left:72px;
+      top:68px;
+      width:258px;
+      min-height:150px;
+      padding:23px 22px 20px 40px;
+      background:#fff;
+      border:1px solid #dde2ea;
+      border-radius:5px;
+      box-shadow:0 8px 22px rgba(28,42,68,.20);
+      z-index:80;
+    }
+    .popup-caret {
+      position:absolute;
+      top:-11px;
+      left:25px;
+      width:20px;
+      height:20px;
+      background:#fff;
+      border-left:1px solid #dde2ea;
+      border-top:1px solid #dde2ea;
+      transform:rotate(45deg);
+    }
+    .popup-close { position:absolute; right:13px; top:8px; border:0; background:transparent; color:#555b65; font-size:28px; line-height:1; cursor:pointer; font-weight:300; }
+    .internal-person-row { display:grid; grid-template-columns:28px minmax(0,1fr); gap:12px; align-items:start; margin:0 0 18px; }
+    .internal-person-row:last-child { margin-bottom:0; }
+    .internal-avatar,.headset-avatar { width:28px; height:28px; border-radius:50%; }
+    .internal-avatar { object-fit:cover; }
+    .headset-avatar { color:#2c64d6; display:flex; align-items:center; justify-content:center; }
+    .headset-avatar svg { width:26px; height:26px; stroke-width:2.2; }
+    .internal-person-name { font-size:16px; color:#262b34; line-height:1.2; margin:1px 0 7px; }
+    .internal-device-line { display:flex; align-items:center; gap:8px; font-size:15px; color:#3d4149; white-space:nowrap; }
+    .info-icon { width:19px; height:19px; color:#5a5e65; }
+    .internal-divider { display:inline-block; width:2px; height:21px; background:#e2e6ec; margin-left:2px; }
+    .score-smile { width:20px; height:20px; border:2px solid #398b2b; color:#398b2b; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; line-height:1; }
+    .internal-device-line strong { color:#2b3548; font-size:15px; }
+    .external-card { min-height:146px; padding-top:15px; }
+    .external-row { display:flex; align-items:center; gap:12px; min-height:31px; color:#2a2d35; }
+    .external-icon { width:23px; height:23px; color:#183765; stroke-width:2; flex:0 0 auto; }
+    .external-value { font-size:16px; line-height:1.15; color:#2a2d35; min-width:0; }
+    .external-score-row { display:flex; align-items:center; gap:7px; margin-top:2px; }
+    .thumb-score-icon { width:24px; height:24px; border-radius:50%; background:#3d9328; color:#fff; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+    .thumb-score-icon svg { width:17px; height:17px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .external-score-row .score { color:#30405d; font-size:16px; font-weight:700; }
+    .external-score-row .trend { min-width:139px; height:28px; padding:0 13px; margin-left:4px; display:inline-flex; align-items:center; gap:8px; border-radius:5px; background:#368d28; font-size:16px; font-weight:400; text-transform:lowercase; }
+    .external-score-row .trend #sentimentTrend { text-transform:lowercase; }
+    .trend-arrows { display:inline-block; color:#fff; font-size:21px; transform:translateY(-1px); letter-spacing:-6px; width:20px; }
+    .recording-area { overflow:visible; }
+    .record-main { position:relative; z-index:1; }
+    .interaction-view { grid-template-columns:minmax(0,1fr) var(--sidebar); }
+    .transcript-toolbar { height:70px; padding:0 22px; }
+    .ai-outline { gap:8px; }
+    .mini-toggle { width:31px; height:17px; background:#e4e7ec; box-shadow:inset 0 0 0 1px #d5dae3; }
+    .mini-toggle::after { width:13px; height:13px; border:2px solid #2450ae; background:#fff; left:2px; top:2px; }
+    .mini-toggle.on { background:#dce5ff; }
+    .mini-toggle.on::after { left:16px; background:#2450ae; }
+
+    /* AI outline mode based on the supplied Genesys sample */
+    .outline-segment { border-top:1px solid #e0e4ea; }
+    .outline-segment-first { border-top:1px solid #d9dde5; }
+    .outline-segment-header { min-height:60px; display:flex; align-items:center; justify-content:space-between; gap:18px; padding:10px 14px 10px 18px; }
+    .outline-left { min-width:0; flex:1 1 auto; }
+    .outline-title { font-size:13px; font-weight:700; color:#293247; margin-bottom:4px; }
+    .outline-description { font-size:12px; color:#5f6775; line-height:1.35; }
+    .outline-right { display:flex; align-items:center; gap:8px; flex:0 0 auto; }
+    .outline-event-icons { display:flex; align-items:center; gap:6px; }
+    .outline-topic.topic-badge { width:20px; height:20px; font-size:10px; margin:0; }
+    .outline-overflow { display:inline-flex; align-items:center; min-height:21px; padding:0 7px; border:1px solid #c4cbd6; border-radius:10px; color:#4e5664; font-size:10px; font-weight:700; background:#fff; }
+    .outline-count { display:inline-flex; align-items:center; gap:3px; font-size:10px; font-weight:700; color:#384150; }
+    .outline-sentiment-icon { width:19px; height:19px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; color:#fff; font-size:9px; }
+    .outline-count.positive .outline-sentiment-icon,.outline-count.empathy .outline-sentiment-icon { background:#3c8527; }
+    .outline-count.negative .outline-sentiment-icon,.outline-count.unhelpful .outline-sentiment-icon { background:#ea0b0b; }
+    .outline-expand { width:32px; height:32px; border:0; border-radius:3px; background:transparent; color:#4e596b; font-size:18px; cursor:pointer; transition:background .15s ease; }
+    .outline-expand:hover { background:#f2f4f8; }
+    .outline-expand span { display:block; transition:transform .15s ease; }
+    .outline-expand.open span { transform:rotate(180deg); }
+    .outline-expanded { border-top:1px solid #edf0f4; background:#fbfcfe; padding:4px 0; }
+    .outline-transcript-line { display:grid; grid-template-columns:52px 90px minmax(0,1fr); gap:10px; padding:8px 18px; font-size:12px; line-height:1.4; color:#343a46; }
+    .outline-transcript-line.customer { background:#f7f8fb; }
+    .outline-time { font-weight:700; color:#445067; }
+    .outline-speaker { color:#17409a; font-weight:700; }
+    @media (max-width: 1500px) {
+      :root { --sidebar: 460px; --participant: 240px; }
+      .global-search { width: 300px; }
+      .top-actions { gap:8px; }
+      .top-action { padding:0 9px; }
+    }
+
+  </style>
+</head>
+<body class="edit-mode">
+  <div class="demo-controls" id="demoControls">
+    <strong>Demo Builder</strong>
+    <select id="scenarioSelect" aria-label="Scenario template"></select>
+    <button id="modeToggle" class="primary" type="button">Presentation mode</button>
+    <button id="saveBtn" type="button">Save locally</button>
+    <button id="resetBtn" type="button">Reset template</button>
+    <button id="exportBtn" type="button">Export JSON</button>
+    <button id="importBtn" type="button">Import JSON</button>
+    <input id="importFile" class="hidden" type="file" accept="application/json" />
+    <span class="presentation-hint">Ctrl+Shift+E returns to edit mode</span>
+    <div class="spacer"></div>
+    <div class="status" id="saveStatus">Template loaded</div>
+  </div>
+
+  <div class="app-shell" id="appShell">
+    <header class="topbar">
+      <img class="genesys-logo" src="assets/genesys-logo.png" alt="Genesys">
+      <button class="menu-btn" type="button" id="menuBtn">
+        <svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg><span>Menu</span>
+      </button>
+      <div class="global-search"><span class="search-icon"></span><span>Search for pages, users, groups and locations</span></div>
+      <div class="top-actions">
+        <button class="top-action" data-top-action="Help" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 1 1 4.9 1.2c-.8 1-2.4 1.2-2.4 3M12 17h.01"/></svg><span>Help</span>
+        </button>
+        <button class="top-action" data-top-action="Calls" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.4 3.8 4.8 5.1c-.9.5-1.3 1.5-1 2.5 1.8 5.7 6.3 10.2 12 12 .9.3 2-.1 2.5-1l1.3-2.6-4.3-2-1.4 2.1c-2.6-1.1-4.9-3.4-6-6l2.1-1.4-2-4.9Z"/></svg><span>Calls</span>
+        </button>
+        <button class="top-action" data-top-action="Chat" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v11H9l-5 3v-14Z"/></svg><span>Chat</span>
+        </button>
+        <button class="top-action" data-top-action="Apps" type="button">
+          <svg class="nav-icon apps-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>Apps</span>
+        </button>
+        <button class="top-action inbox-action" data-top-action="Inbox" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14l2 10v4H3v-4L5 5Z"/><path d="M3.7 15h4.8l1.1 2h4.8l1.1-2h4.8"/></svg><span>Inbox</span><span class="inbox-badge">3</span>
+        </button>
+        <button class="top-action workspace-action" data-top-action="Agent Workspace" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2.2C3 15.2 5.5 13 9 13s6 2.2 6 4.8V20M18 7c1 .8 1.5 1.8 1.5 3S19 12.2 18 13M21 5c1.6 1.4 2.5 3 2.5 5s-.9 3.6-2.5 5"/></svg><span>Agent Workspace</span>
+        </button>
+        <button class="queue-toggle" data-top-action="Queue status" type="button"><span>Off Queue</span><span class="switch" aria-hidden="true"></span></button>
+        <button class="spark-btn" data-top-action="AI" type="button" aria-label="AI">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3 1.1 3.1L13 7.2l-2.9 1.1L9 11.5 7.9 8.3 5 7.2l2.9-1.1L9 3Z"/><path d="m16.5 9 1.5 4 3.8 1.5-3.8 1.5-1.5 4-1.5-4-3.8-1.5 3.8-1.5 1.5-4Z"/><path d="m5 15 .7 1.8 1.8.7-1.8.7L5 20l-.7-1.8-1.8-.7 1.8-.7L5 15Z"/></svg>
+        </button>
+        <button class="avatar-button" data-top-action="Profile" type="button" aria-label="Profile"><img src="assets/profile.png" alt=""></button>
+      </div>
+    </header>
+
+    <nav class="workspace-tabs">
+      <div class="workspace-tab">Content Se... <span class="dots">⋮</span></div>
+      <div class="workspace-tab">f015ca94-a... <span class="dots">⋮</span></div>
+      <div class="workspace-tab">3dadbc6b-... <span class="dots">⋮</span></div>
+      <div class="workspace-tab active">71e6fbca-2... <span class="dots">⋮</span></div>
+      <button class="add-tab" type="button">+</button>
+    </nav>
+
+    <div class="interaction-strip">
+      <span class="phone-glyph">⌕</span>
+      <span class="interaction-id" id="interactionId">71e6fbca-2765-4655-9ad9-4df968...</span>
+      <button class="copy-mini" type="button" id="copyIdBtn" title="Copy interaction ID">▣</button>
+      <div class="last-updated"><span>Last updated: <span id="lastUpdated">October 20, 2026 3:50 PM</span></span><span>▣</span></div>
+    </div>
+
+    <section class="recording-area">
+      <aside class="participant-panel">
+        <div class="part-card transfer-card"><div class="part-row transfer-row"><svg class="participant-mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h12M14 4l3 3-3 3M19 17H7M10 14l-3 3 3 3"/></svg><span>Transferred</span></div></div>
+        <div class="part-card internal-card">
+          <button class="participant-heading-button" id="internalHeading" type="button">INTERNAL</button>
+          <button class="internal-trigger" id="internalTrigger" type="button" aria-expanded="false">
+            <svg class="participant-main-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20v-2c0-3.2 2.4-5.7 5.5-5.7s5.5 2.5 5.5 5.7v2M14 13.5c2.9 0 5 2 5 4.8V20"/></svg>
+            <span class="internal-link">Multiple</span>
+            <svg class="chevron-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="participant-popup hidden" id="internalPopup" role="dialog" aria-label="Internal participants">
+            <span class="popup-caret" aria-hidden="true"></span>
+            <button class="popup-close" id="internalPopupClose" type="button" aria-label="Close">×</button>
+            <div class="internal-person-row">
+              <img class="internal-avatar" src="assets/bob-summers.png" alt="">
+              <div class="internal-person-copy">
+                <div class="internal-person-name">Bob Summers</div>
+                <div class="internal-device-line"><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7h.01"/></svg><span>SIP Device</span><span class="internal-divider"></span><span class="score-smile">☺</span><strong>+100</strong></div>
+              </div>
+            </div>
+            <div class="internal-person-row">
+              <span class="headset-avatar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13v-2a7 7 0 0 1 14 0v2M5 13H3v5h4v-5H5ZM19 13h2v5h-4v-5h2ZM17 19c-1 1-2.7 1.5-5 1.5"/></svg></span>
+              <div class="internal-person-copy">
+                <div class="internal-person-name">Bob Manager</div>
+                <div class="internal-device-line"><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7h.01"/></svg><span>SIP Device</span><span class="internal-divider"></span><strong>--</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="part-card external-card">
+          <div class="participant-heading">EXTERNAL</div>
+          <div class="external-row">
+            <svg class="external-icon user-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M6.7 18c1.2-2.6 3-3.8 5.3-3.8s4.1 1.2 5.3 3.8"/></svg>
+            <span id="customerName" class="editable-text external-value"></span>
+          </div>
+          <div class="external-row">
+            <svg class="external-icon docs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8l4 4v12H8V4Z"/><path d="M16 4v4h4M4 8h4v12h8v2H4V8Z"/></svg>
+            <span id="customerPhone" class="editable-text external-value"></span>
+          </div>
+          <div class="external-score-row">
+            <span class="thumb-score-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10v10H4V10h4Zm2 9h6.2c1.1 0 2-.7 2.3-1.8l1.1-4c.4-1.4-.7-2.8-2.1-2.8H14l.7-3.1c.3-1.4-.6-2.7-2-3L10 10v9Z"/></svg></span>
+            <span id="sentimentScore" class="score editable-text"></span>
+            <span class="trend"><span class="trend-arrows" aria-hidden="true">⌃⌃</span><span id="sentimentTrend" class="editable-text"></span></span>
+          </div>
+        </div>
+      </aside>
+
+      <div class="record-main">
+        <div class="record-meta">
+          <div class="meta-block">
+            <div class="meta-icon">☎</div>
+            <div><div class="meta-title">RECORDING START TIME</div><div id="recordStart" class="meta-value editable-text"></div></div>
+          </div>
+          <div class="meta-center"><div class="meta-title">PROGRESS</div><div class="meta-value"><span id="progressText">0m 00s</span> / <span id="durationText"></span></div></div>
+          <div class="meta-right"><div class="meta-title">RECORDING END TIME</div><div id="recordEnd" class="meta-value editable-text"></div></div>
+        </div>
+
+        <div class="wave-wrap">
+          <div>
+            <div class="wave-area" id="waveArea">
+              <div class="waveform" id="waveform"></div>
+              <div class="playhead" id="playhead"></div>
+              <div class="marker-layer" id="markerLayer"></div>
+              <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
+            <div class="annotation-row">
+              <div class="annotation-input"><span>✎</span><input id="annotationInput" type="text" placeholder="Add Annotation" /></div>
+              <button id="annotateBtn" class="annotate-btn" type="button">Annotate</button>
+            </div>
+            <div class="page-nav"><button id="prevWave" type="button">‹</button><span><span id="wavePage">1</span> of 2</span><button id="nextWave" type="button">›</button></div>
+          </div>
+          <div class="play-controls">
+            <div class="vol">🔊</div>
+            <button class="play-btn" id="playBtn" type="button" aria-label="Play recording"></button>
+            <div class="vertical-slider"></div>
+            <span class="speed">x1</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="detail-tabs">
+      <button class="detail-tab" data-detail-tab="details" type="button">Details</button>
+      <button class="detail-tab" data-detail-tab="timeline" type="button">Timeline</button>
+      <button class="detail-tab" data-detail-tab="quality" type="button">Quality Summary</button>
+      <button class="detail-tab active" data-detail-tab="transcript" type="button">Transcript</button>
+      <button class="detail-tab" data-detail-tab="audit" type="button">Audit Trail</button>
+      <button class="detail-tab" data-detail-tab="journeys" type="button">Customer Journeys</button>
+      <button class="schedule-btn" id="scheduleBtn" type="button">Schedule Coaching ⌄</button>
+    </div>
+
+    <div id="detailContent">
+      <section class="interaction-view" id="transcriptView">
+        <div class="transcript-pane">
+          <div class="transcript-toolbar">
+            <span class="lock">♧</span>
+            <label class="transcript-search"><span class="search-icon"></span><input id="transcriptSearch" type="search" placeholder="Search" /></label>
+            <div class="toolbar-spacer"></div>
+            <div class="ai-outline"><button id="outlineToggle" class="mini-toggle" type="button" aria-label="Toggle AI outline"></button><span>AI outline</span></div>
+            <button class="tool-icon" type="button" title="Expand transcript">↗</button>
+            <button class="tool-icon" type="button" title="Language tools">A▧</button>
+            <button class="tool-icon" id="copyTranscriptBtn" type="button" title="Copy transcript">▣</button>
+          </div>
+          <div class="transcript-scroller" id="transcriptScroller"></div>
+        </div>
+
+        <aside class="sidepanel">
+          <div class="side-tabs">
+            <button class="side-tab active" data-side-tab="insights" type="button">AI Insights</button>
+            <button class="side-tab" data-side-tab="events" type="button">Events</button>
+          </div>
+          <div class="side-scroll" id="sideScroll">
+            <div id="insightsPanel"></div>
+            <div id="eventsPanel" class="hidden"></div>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+      const deepClone = obj => JSON.parse(JSON.stringify(obj));
+      const pad2 = n => String(n).padStart(2, '0');
+      const fmtTime = sec => `${Math.floor(sec / 60)}:${pad2(Math.max(0, Math.round(sec % 60)))}`;
+      const fmtLong = sec => `${Math.floor(sec / 60)}m ${pad2(Math.max(0, Math.round(sec % 60)))}s`;
+      const parseTime = value => {
+        const s = String(value || '').trim();
+        if (/^\d+$/.test(s)) return Math.max(0, Number(s));
+        const m = s.match(/^(\d+):([0-5]?\d)$/);
+        if (!m) return 0;
+        return Number(m[1]) * 60 + Number(m[2]);
+      };
+      const uid = prefix => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+      const templates = {
+        referral: {
+          label: 'Referral appointment',
+          interactionId: '71e6fbca-2765-4655-9ad9-4df968c4aa14',
+          customerName: 'Carter, Elena', customerPhone: '+1 858-555-0184', sentimentScore: '+41', sentimentTrend: 'Improving',
+          recordStart: 'Mon, October 19, 2026 at 10:14:08 AM', recordEnd: 'Mon, October 19, 2026 at 10:18:22 AM', duration: 254,
+          program: 'Patient Access Center - English', virtualAgent: false,
+          transcript: [
+            {id:'r1',time:4,role:'ivr',speaker:'IVR',text:'Thank you for calling Northstar Health Patient Access.'},
+            {id:'r2',time:10,role:'agent',speaker:'Jamie',text:'Thank you for calling Patient Access. My name is Jamie. How can I help today?'},
+            {id:'r3',time:22,role:'customer',speaker:'Elena Carter',text:'Hi. My primary care doctor sent a referral to cardiology last week, and I am trying to find out if you received it.'},
+            {id:'r4',time:35,role:'agent',speaker:'Jamie',text:'I can check that for you. Let me verify your date of birth and the referring provider.'},
+            {id:'r5',time:47,role:'customer',speaker:'Elena Carter',text:'Sure. I have actually called twice already because I was not sure if the referral made it over.'},
+            {id:'r6',time:61,role:'agent',speaker:'Jamie',text:'I understand. I can see the referral from Harbor Primary Care was received three days ago and the clinical notes are attached.'},
+            {id:'r7',time:84,role:'agent',speaker:'Jamie',text:'Your plan does not require a separate authorization for this visit, so I can go ahead and look at cardiology appointments.'},
+            {id:'r8',time:104,role:'customer',speaker:'Elena Carter',text:'That would be great. I was worried I would have to start the referral over.'},
+            {id:'r9',time:121,role:'agent',speaker:'Jamie',text:'The earliest appointment is Tuesday, November 3 at 10:30 AM with Dr. Chen at the La Jolla clinic. I also have Thursday afternoon.'},
+            {id:'r10',time:145,role:'customer',speaker:'Elena Carter',text:'Tuesday at 10:30 works for me.'},
+            {id:'r11',time:156,role:'agent',speaker:'Jamie',text:'You are scheduled for November 3 at 10:30 AM. I am linking the referral to the appointment now.'},
+            {id:'r12',time:176,role:'agent',speaker:'Jamie',text:'I am also sending a text with the location, arrival time, and what to bring. Please arrive 15 minutes early with your medication list.'},
+            {id:'r13',time:198,role:'customer',speaker:'Elena Carter',text:'Perfect. That is exactly what I needed. Thank you for getting it taken care of.'},
+            {id:'r14',time:212,role:'agent',speaker:'Jamie',text:'You are all set. Is there anything else I can help with today?'},
+            {id:'r15',time:223,role:'customer',speaker:'Elena Carter',text:'No, that is everything. Thanks again.'}
+          ],
+          insights: {
+            summary:'Elena Carter called to confirm whether a cardiology referral from Harbor Primary Care had been received after two prior contacts. The agent located the referral, confirmed required notes were attached and no separate authorization was needed, then scheduled the earliest available cardiology visit for November 3 at 10:30 AM with Dr. Chen. The referral was linked to the appointment and location and arrival instructions were sent by SMS.',
+            reasonTitle:'Referral status and specialty appointment scheduling',
+            reasonDesc:'Patient had not received outreach after a PCP referral and called again to verify receipt. This was a repeat contact. The patient wanted to avoid restarting the referral process and asked to schedule as soon as the referral was confirmed.',
+            resolutionTitle:'Resolved',
+            resolutionDesc:'Referral was found and linked to the appointment. Cardiology visit was scheduled for November 3 at 10:30 AM. Patient received arrival and location instructions by SMS and confirmed the appointment time works.',
+            actionTitle:'Follow up not needed',
+            actionDesc:'No additional patient action is required before the visit beyond arriving 15 minutes early and bringing a medication list. Repeat contact occurred because the referral had been received three days earlier but the patient had not yet been contacted.',
+            sentiments:[
+              {type:'negative',title:'Uncertainty after repeat contact',desc:'Patient said she had called twice because she was not sure the referral had been received.'},
+              {type:'positive',title:'Appointment secured',desc:'Sentiment improved after the referral was located and the requested cardiology appointment was scheduled with clear next steps.'}
+            ],
+            agentSummaries:[{name:'Jamie Rivera',text:'Verified the patient and referring provider, located the cardiology referral, confirmed attached notes and authorization requirements, offered available appointment times, scheduled November 3 at 10:30 AM, linked the referral, and sent arrival instructions by SMS.'}]
+          },
+          events:[
+            {id:'re1',type:'topic',label:'Greeting',time:10,transcriptId:'r2'},
+            {id:'re2',type:'topic',label:'Referral Status',time:22,transcriptId:'r3'},
+            {id:'re3',type:'topic',label:'Repeat Contact',time:47,transcriptId:'r5'},
+            {id:'re4',type:'negative',label:'Uncertain referral status after prior calls',time:47,transcriptId:'r5'},
+            {id:'re5',type:'empathy',label:'Acknowledges repeat effort',time:61,transcriptId:'r6'},
+            {id:'re6',type:'topic',label:'Insurance Verification',time:84,transcriptId:'r7'},
+            {id:'re7',type:'topic',label:'Appointment Scheduling',time:121,transcriptId:'r9'},
+            {id:'re8',type:'topic',label:'Appointment Confirmation',time:156,transcriptId:'r11'},
+            {id:'re9',type:'positive',label:'Relief after appointment booked',time:198,transcriptId:'r13'},
+            {id:'re10',type:'topic',label:'Check for Resolution',time:212,transcriptId:'r14'}
+          ]
+        },
+
+        newpatient: {
+          label: 'New patient scheduling',
+          interactionId: 'ce6949d0-2ed7-43a1-a680-46b89c80bb31',
+          customerName: 'Martinez, Sofia', customerPhone: '+1 619-555-0129', sentimentScore: '+56', sentimentTrend: 'Improving',
+          recordStart: 'Tue, October 20, 2026 at 9:02:14 AM', recordEnd: 'Tue, October 20, 2026 at 9:06:42 AM', duration: 268,
+          program: 'Patient Access Center - English', virtualAgent: false,
+          transcript:[
+            {id:'n1',time:4,role:'ivr',speaker:'IVR',text:'Thank you for calling Northstar Health Patient Access.'},
+            {id:'n2',time:11,role:'agent',speaker:'Riley',text:'Patient Access, this is Riley. How may I help you?'},
+            {id:'n3',time:20,role:'customer',speaker:'Sofia Martinez',text:'I am new to the health system and need to establish care with a primary care doctor.'},
+            {id:'n4',time:34,role:'agent',speaker:'Riley',text:'I can help with that. Are you looking for a particular location or provider preference?'},
+            {id:'n5',time:46,role:'customer',speaker:'Sofia Martinez',text:'Somewhere near Hillcrest would be best, and I would prefer a female physician if possible.'},
+            {id:'n6',time:62,role:'agent',speaker:'Riley',text:'I have two providers accepting new patients in Hillcrest. Let me check which one is in network with your plan.'},
+            {id:'n7',time:93,role:'agent',speaker:'Riley',text:'Dr. Patel is in network and has a new-patient appointment on November 12 at 2:20 PM.'},
+            {id:'n8',time:111,role:'customer',speaker:'Sofia Martinez',text:'That works. I have been trying to get this set up before my prescription runs out next month.'},
+            {id:'n9',time:131,role:'agent',speaker:'Riley',text:'I can schedule that visit. I will also note that you are establishing care and have a medication continuity concern for the provider to review.'},
+            {id:'n10',time:157,role:'agent',speaker:'Riley',text:'You are booked for November 12 at 2:20 PM with Dr. Patel. I am sending the registration link and clinic address by text.'},
+            {id:'n11',time:181,role:'customer',speaker:'Sofia Martinez',text:'Great, thank you. Do I need to send records from my old doctor?'},
+            {id:'n12',time:196,role:'agent',speaker:'Riley',text:'If you have recent records, the text will include a secure link with instructions to request or upload them before the visit.'},
+            {id:'n13',time:218,role:'customer',speaker:'Sofia Martinez',text:'Perfect. I appreciate the help.'}
+          ],
+          insights:{
+            summary:'Sofia Martinez called as a new patient to establish primary care near Hillcrest and requested a female physician. The agent identified providers accepting new patients, verified network participation, and scheduled Sofia with Dr. Patel for November 12 at 2:20 PM. Registration and location details were sent by SMS. Sofia also mentioned wanting care established before a current prescription runs out next month, which the agent documented for provider review.',
+            reasonTitle:'Establish primary care and schedule first visit',
+            reasonDesc:'New patient requested a nearby primary care provider, preferred a female physician, and wanted an appointment before an existing medication supply runs out next month.',
+            resolutionTitle:'Resolved',
+            resolutionDesc:'New-patient appointment scheduled for November 12 at 2:20 PM with an in-network provider matching location and provider preferences. Registration and records-transfer instructions were sent by SMS.',
+            actionTitle:'Patient to complete registration',
+            actionDesc:'Patient should complete the secure registration link and send recent outside records if available. Medication continuity concern was documented for provider review at the appointment.',
+            sentiments:[{type:'positive',title:'Confidence after finding a matching provider',desc:'Patient responded positively after an in-network provider matched both location and provider preferences.'}],
+            agentSummaries:[{name:'Riley Morgan',text:'Captured location and provider preferences, found accepting new-patient providers, verified network participation, booked Dr. Patel for November 12 at 2:20 PM, documented medication continuity concern, and sent registration and records instructions by SMS.'}]
+          },
+          events:[
+            {id:'ne1',type:'topic',label:'Greeting',time:11,transcriptId:'n2'},
+            {id:'ne2',type:'topic',label:'New Patient',time:20,transcriptId:'n3'},
+            {id:'ne3',type:'topic',label:'Provider Preference',time:46,transcriptId:'n5'},
+            {id:'ne4',type:'topic',label:'Insurance Verification',time:62,transcriptId:'n6'},
+            {id:'ne5',type:'topic',label:'Appointment Scheduling',time:93,transcriptId:'n7'},
+            {id:'ne6',type:'topic',label:'Medication Continuity',time:111,transcriptId:'n8'},
+            {id:'ne7',type:'positive',label:'Matched provider and time',time:157,transcriptId:'n10'},
+            {id:'ne8',type:'topic',label:'Medical Records',time:181,transcriptId:'n11'},
+            {id:'ne9',type:'topic',label:'Check for Resolution',time:218,transcriptId:'n13'}
+          ]
+        },
+
+        reschedule: {
+          label: 'Reschedule / cancel appointment',
+          interactionId: '40c7213f-5e42-44db-96b5-4d5fd14a2f88',
+          customerName: 'Nguyen, Daniel', customerPhone: '+1 760-555-0170', sentimentScore: '+28', sentimentTrend: 'Improving',
+          recordStart: 'Tue, October 20, 2026 at 11:31:05 AM', recordEnd: 'Tue, October 20, 2026 at 11:35:11 AM', duration: 246,
+          program: 'Patient Access Center - English', virtualAgent: false,
+          transcript:[
+            {id:'s1',time:5,role:'agent',speaker:'Avery',text:'Thank you for calling Patient Access. This is Avery. How can I help?'},
+            {id:'s2',time:14,role:'customer',speaker:'Daniel Nguyen',text:'I need to move my neurology appointment. My ride canceled for Thursday.'},
+            {id:'s3',time:28,role:'agent',speaker:'Avery',text:'I can look for another time. Let me pull up the appointment first.'},
+            {id:'s4',time:43,role:'customer',speaker:'Daniel Nguyen',text:'I really do not want to push it out another month. I have already been waiting a while.'},
+            {id:'s5',time:58,role:'agent',speaker:'Avery',text:'I understand. I will check both your current clinic and the nearby location so we can minimize the delay.'},
+            {id:'s6',time:83,role:'agent',speaker:'Avery',text:'The same clinic is booked for three weeks, but the Encinitas location has an opening next Tuesday at 1:40 PM.'},
+            {id:'s7',time:104,role:'customer',speaker:'Daniel Nguyen',text:'That is much better. I can get a ride there Tuesday.'},
+            {id:'s8',time:119,role:'agent',speaker:'Avery',text:'I am moving the appointment to Tuesday at 1:40 PM in Encinitas. Your original Thursday appointment will be released.'},
+            {id:'s9',time:143,role:'agent',speaker:'Avery',text:'I have also added you to the cancellation list for your preferred clinic in case something earlier opens.'},
+            {id:'s10',time:165,role:'customer',speaker:'Daniel Nguyen',text:'That helps. Thank you for checking another location instead of just canceling it.'},
+            {id:'s11',time:183,role:'agent',speaker:'Avery',text:'Of course. I am sending the new address and appointment time by text now.'},
+            {id:'s12',time:202,role:'customer',speaker:'Daniel Nguyen',text:'Got it. Thanks.'}
+          ],
+          insights:{
+            summary:'Daniel Nguyen called to reschedule a neurology appointment because his transportation for Thursday fell through. He was concerned about extending an already long wait. The agent searched multiple locations, found an appointment the following Tuesday at 1:40 PM in Encinitas, moved the visit, released the original slot, and added Daniel to the preferred-clinic cancellation list. The new address and appointment details were sent by SMS.',
+            reasonTitle:'Reschedule specialty appointment due to transportation barrier',
+            reasonDesc:'Patient needed to change a neurology visit because a planned ride canceled. He specifically expressed concern about a long delay in care if the appointment had to move several weeks.',
+            resolutionTitle:'Resolved with alternate location',
+            resolutionDesc:'Appointment moved to a nearby clinic five days later rather than delaying three weeks at the original location. Original slot released and patient added to preferred-clinic cancellation list.',
+            actionTitle:'Monitor cancellation list',
+            actionDesc:'Patient has a confirmed appointment and does not need to call again unless transportation changes. Cancellation list may move the visit back to the preferred clinic if an earlier slot opens.',
+            sentiments:[
+              {type:'negative',title:'Concern about care delay',desc:'Patient said he had already been waiting and did not want the appointment pushed out another month.'},
+              {type:'positive',title:'Relief after alternate option',desc:'Patient responded positively when the agent searched another location and preserved a near-term appointment.'}
+            ],
+            agentSummaries:[{name:'Avery Brooks',text:'Reviewed existing neurology appointment, searched availability at two locations, moved the visit to next Tuesday at 1:40 PM in Encinitas, released the original appointment, added the patient to the preferred-location cancellation list, and texted updated location details.'}]
+          },
+          events:[
+            {id:'se1',type:'topic',label:'Reschedule Appointment',time:14,transcriptId:'s2'},
+            {id:'se2',type:'negative',label:'Concern about appointment delay',time:43,transcriptId:'s4'},
+            {id:'se3',type:'empathy',label:'Acknowledges care delay concern',time:58,transcriptId:'s5'},
+            {id:'se4',type:'topic',label:'Alternate Location',time:83,transcriptId:'s6'},
+            {id:'se5',type:'positive',label:'Earlier option accepted',time:104,transcriptId:'s7'},
+            {id:'se6',type:'topic',label:'Appointment Confirmation',time:119,transcriptId:'s8'},
+            {id:'se7',type:'topic',label:'Cancellation List',time:143,transcriptId:'s9'},
+            {id:'se8',type:'topic',label:'Check for Resolution',time:183,transcriptId:'s11'}
+          ]
+        },
+
+        authorization: {
+          label: 'Insurance / prior authorization',
+          interactionId: '0de7a642-b7fa-4f62-a43d-35d65d875422',
+          customerName: 'Hill, Marcus', customerPhone: '+1 858-555-0162', sentimentScore: '-12', sentimentTrend: 'Stable',
+          recordStart: 'Tue, October 20, 2026 at 1:08:48 PM', recordEnd: 'Tue, October 20, 2026 at 1:13:03 PM', duration: 255,
+          program: 'Patient Access Center - English', virtualAgent: false,
+          transcript:[
+            {id:'a1',time:6,role:'agent',speaker:'Taylor',text:'Patient Access, this is Taylor. How can I help you today?'},
+            {id:'a2',time:16,role:'customer',speaker:'Marcus Hill',text:'I have an MRI on Thursday and I got a message that insurance approval might still be pending. I need to know if I should keep the appointment.'},
+            {id:'a3',time:38,role:'agent',speaker:'Taylor',text:'I can check the authorization status and the appointment notes. One moment while I review both.'},
+            {id:'a4',time:62,role:'agent',speaker:'Taylor',text:'The MRI authorization was submitted on Monday and is still pending with the health plan. There is not a denial on file.'},
+            {id:'a5',time:84,role:'customer',speaker:'Marcus Hill',text:'I am worried I am going to show up and get stuck with the full bill.'},
+            {id:'a6',time:98,role:'agent',speaker:'Taylor',text:'I understand why you would want clarity before the visit. I cannot guarantee the plan decision, but I can check the escalation notes and arrange follow-up.'},
+            {id:'a7',time:123,role:'agent',speaker:'Taylor',text:'The authorization team already has the clinical documentation and will recheck status tomorrow morning. I am adding a callback task for you by noon.'},
+            {id:'a8',time:147,role:'customer',speaker:'Marcus Hill',text:'So I should wait for that call before deciding whether to cancel?'},
+            {id:'a9',time:158,role:'agent',speaker:'Taylor',text:'Yes. Your appointment remains scheduled. We will contact you with the authorization update before noon tomorrow so you can make an informed decision.'},
+            {id:'a10',time:186,role:'customer',speaker:'Marcus Hill',text:'Okay. I feel better knowing someone is actually checking it.'},
+            {id:'a11',time:202,role:'agent',speaker:'Taylor',text:'I have documented the callback commitment and your concern about financial responsibility. You should not need to call again before then.'}
+          ],
+          insights:{
+            summary:'Marcus Hill called about an MRI scheduled for Thursday after receiving notice that insurance authorization might still be pending. The agent confirmed the authorization was submitted Monday and remains pending, with no denial on file. The authorization team has the needed clinical documentation. A callback task was created for an update by noon tomorrow while the MRI appointment remains scheduled.',
+            reasonTitle:'Confirm prior authorization before scheduled imaging',
+            reasonDesc:'Patient wanted to know whether to keep an MRI appointment because authorization was still pending and he was concerned about unexpected financial responsibility.',
+            resolutionTitle:'Partially resolved',
+            resolutionDesc:'Current status was confirmed, but final authorization is still pending with the health plan. Appointment remains scheduled. Patient was told a status update will be provided by noon tomorrow before the visit.',
+            actionTitle:'Callback required by noon tomorrow',
+            actionDesc:'Authorization team should recheck payer status tomorrow morning and contact the patient by noon. The interaction contains a specific callback commitment that remains outstanding.',
+            sentiments:[
+              {type:'negative',title:'Financial risk concern',desc:'Patient expressed worry that he could arrive for the MRI and become responsible for the full cost.'},
+              {type:'positive',title:'Confidence after ownership established',desc:'Patient said he felt better after learning that a specific team was reviewing the authorization and a callback commitment was documented.'}
+            ],
+            agentSummaries:[{name:'Taylor Kim',text:'Reviewed MRI appointment and prior-authorization notes, confirmed pending status with no denial, verified clinical documentation is on file, kept the appointment scheduled, created a callback commitment by noon tomorrow, and documented the patient financial concern.'}]
+          },
+          events:[
+            {id:'ae1',type:'topic',label:'Prior Authorization',time:16,transcriptId:'a2'},
+            {id:'ae2',type:'topic',label:'Authorization Status',time:62,transcriptId:'a4'},
+            {id:'ae3',type:'negative',label:'Concern about unexpected cost',time:84,transcriptId:'a5'},
+            {id:'ae4',type:'empathy',label:'Acknowledges financial concern',time:98,transcriptId:'a6'},
+            {id:'ae5',type:'topic',label:'Callback Commitment',time:123,transcriptId:'a7'},
+            {id:'ae6',type:'topic',label:'Appointment Status',time:158,transcriptId:'a9'},
+            {id:'ae7',type:'positive',label:'Confidence after clear ownership',time:186,transcriptId:'a10'},
+            {id:'ae8',type:'topic',label:'Follow-up Required',time:202,transcriptId:'a11'}
+          ]
+        },
+
+        billing: {
+          label: 'Billing / payment question',
+          interactionId: 'e616857b-52d8-43ab-90d7-259109f241aa',
+          customerName: 'Roberts, Maya', customerPhone: '+1 949-555-0136', sentimentScore: '+19', sentimentTrend: 'Improving',
+          recordStart: 'Tue, October 20, 2026 at 2:21:31 PM', recordEnd: 'Tue, October 20, 2026 at 2:26:47 PM', duration: 316,
+          program: 'Patient Access Center - English', virtualAgent: false,
+          transcript:[
+            {id:'b1',time:5,role:'agent',speaker:'Jordan',text:'Thank you for calling Patient Services. My name is Jordan. How can I help?'},
+            {id:'b2',time:15,role:'customer',speaker:'Maya Roberts',text:'I paid the bill from my doctor, but now I have another bill from the hospital. I am worried I am being charged twice.'},
+            {id:'b3',time:36,role:'agent',speaker:'Jordan',text:'I can review the account with you and explain what each balance is for.'},
+            {id:'b4',time:58,role:'customer',speaker:'Maya Roberts',text:'This is really confusing. I thought the first payment closed everything out.'},
+            {id:'b5',time:74,role:'agent',speaker:'Jordan',text:'I understand. I see the first payment applied to the professional services bill. The remaining statement is the facility charge from the same visit.'},
+            {id:'b6',time:104,role:'agent',speaker:'Jordan',text:'The two charges are separate, and I do not see a duplicate line item. The facility balance is $238.40.'},
+            {id:'b7',time:128,role:'customer',speaker:'Maya Roberts',text:'Okay, that makes more sense. I just did not know they would come separately.'},
+            {id:'b8',time:148,role:'customer',speaker:'Maya Roberts',text:'Can I split that balance into payments?'},
+            {id:'b9',time:158,role:'agent',speaker:'Jordan',text:'Yes. This balance is eligible for a three-month payment plan. I can set that up now or send you the secure link.'},
+            {id:'b10',time:182,role:'customer',speaker:'Maya Roberts',text:'Please send the link. I would rather set it up myself tonight.'},
+            {id:'b11',time:198,role:'agent',speaker:'Jordan',text:'The secure payment-plan link has been sent. It will show the monthly amount before you confirm.'},
+            {id:'b12',time:222,role:'customer',speaker:'Maya Roberts',text:'Got it. Thank you for explaining the two bills.'},
+            {id:'b13',time:239,role:'agent',speaker:'Jordan',text:'You are welcome. There is no duplicate charge on the account, and the payment-plan option is available through the link I sent.'}
+          ],
+          insights:{
+            summary:'Maya Roberts called because she received a hospital bill after already paying a physician bill and was concerned she had been charged twice. The agent reviewed the account, confirmed the prior payment applied to professional services, and explained that the remaining $238.40 was a separate facility charge from the same visit. No duplicate line item was found. The balance qualified for a three-month payment plan, and a secure enrollment link was sent by SMS.',
+            reasonTitle:'Clarify separate facility and professional bills',
+            reasonDesc:'Patient believed a second statement might be a duplicate after paying a prior bill from the same visit. She also asked whether the remaining balance could be split into payments.',
+            resolutionTitle:'Resolved',
+            resolutionDesc:'Agent confirmed the statements represented different service components, verified no duplicate charge was present, and provided a three-month payment-plan option. Secure enrollment link was delivered successfully.',
+            actionTitle:'Patient to enroll in payment plan',
+            actionDesc:'No additional staff follow-up is required unless the patient has trouble using the secure link. Patient will review the monthly amount and enroll later today.',
+            sentiments:[
+              {type:'negative',title:'Concern about duplicate billing',desc:'Patient said the separate statements were confusing and worried she was being charged twice.'},
+              {type:'positive',title:'Billing explanation understood',desc:'Patient said the separate professional and facility charges made sense after the agent reviewed the account.'}
+            ],
+            agentSummaries:[{name:'Jordan Lee',text:'Reviewed professional and facility charges, confirmed prior payment and absence of duplicate line items, explained the remaining $238.40 facility balance, identified payment-plan eligibility, and sent a secure three-month-plan enrollment link by SMS.'}]
+          },
+          events:[
+            {id:'be1',type:'topic',label:'Billing Issue',time:15,transcriptId:'b2'},
+            {id:'be2',type:'negative',label:'Concern about duplicate charge',time:58,transcriptId:'b4'},
+            {id:'be3',type:'empathy',label:'Acknowledges billing confusion',time:74,transcriptId:'b5'},
+            {id:'be4',type:'topic',label:'Billing Clarification',time:104,transcriptId:'b6'},
+            {id:'be5',type:'positive',label:'Separate charges understood',time:128,transcriptId:'b7'},
+            {id:'be6',type:'topic',label:'Payment Plan',time:148,transcriptId:'b8'},
+            {id:'be7',type:'topic',label:'Secure Payment Link',time:198,transcriptId:'b11'},
+            {id:'be8',type:'topic',label:'Check for Resolution',time:239,transcriptId:'b13'}
+          ]
+        }
+      };
+
+      const outlineTemplates = {
+        referral: [
+          {title:'Greeting', desc:'The agent greets the patient and begins the referral-status request.', start:0, end:20},
+          {title:'Referral Status', desc:'The agent confirms the referral was received, captures the repeat-contact concern, and verifies visit requirements.', start:20, end:119},
+          {title:'Appointment Scheduling', desc:'The agent reviews cardiology availability and schedules the earliest acceptable appointment.', start:120, end:175},
+          {title:'Appointment Confirmation', desc:'The referral is linked to the appointment and the patient receives arrival instructions and confirms resolution.', start:176, end:9999}
+        ],
+        newpatient: [
+          {title:'New Patient Request', desc:'The patient calls to establish primary care and shares location and provider preferences.', start:0, end:61},
+          {title:'Provider and Coverage Match', desc:'The agent identifies accepting providers and verifies an in-network option that matches the patient preferences.', start:62, end:92},
+          {title:'Appointment Scheduling', desc:'The agent schedules the first visit and documents a medication-continuity concern for provider review.', start:93, end:180},
+          {title:'Registration and Records', desc:'The patient receives registration, clinic, and outside-record instructions and confirms next steps.', start:181, end:9999}
+        ],
+        reschedule: [
+          {title:'Reschedule Request', desc:'The patient needs to move a neurology appointment because transportation fell through and expresses concern about further delay.', start:0, end:57},
+          {title:'Alternate Availability', desc:'The agent searches more than one location and finds a significantly earlier option at a nearby clinic.', start:58, end:118},
+          {title:'Appointment Update', desc:'The appointment is moved, the original slot is released, and the patient is added to a preferred-clinic cancellation list.', start:119, end:182},
+          {title:'Confirmation', desc:'Updated appointment details are sent by text and the patient confirms the new plan works.', start:183, end:9999}
+        ],
+        authorization: [
+          {title:'Authorization Question', desc:'The patient calls before a scheduled MRI to understand whether payer approval is complete.', start:0, end:61},
+          {title:'Authorization Status', desc:'The agent confirms the request is pending, explains there is no denial, and acknowledges the patient financial concern.', start:62, end:122},
+          {title:'Callback Commitment', desc:'The authorization team ownership is confirmed and a specific callback by noon tomorrow is created.', start:123, end:185},
+          {title:'Follow-up Required', desc:'The appointment remains scheduled while the patient waits for the promised authorization update.', start:186, end:9999}
+        ],
+        billing: [
+          {title:'Billing Concern', desc:'The patient reports receiving a second statement and worries that the same visit may have been billed twice.', start:0, end:73},
+          {title:'Billing Clarification', desc:'The agent distinguishes professional and facility charges and confirms there is no duplicate line item.', start:74, end:147},
+          {title:'Payment Plan', desc:'The patient asks about splitting the remaining balance and the agent explains the available payment-plan option.', start:148, end:221},
+          {title:'Resolution', desc:'A secure enrollment link is sent and the patient confirms the billing explanation resolved the concern.', start:222, end:9999}
+        ]
+      };
+
+      const storagePrefix = 'interaction-demo:';
+      let currentKey = 'referral';
+      let current = loadScenario(currentKey);
+      let editMode = true;
+      let sideTab = 'insights';
+      let detailTab = 'transcript';
+      let filterState = {topic:true, positive:true, negative:true, empathy:true, unhelpful:true, annotation:true};
+      let outlineOn = false;
+      let playTimer = null;
+      let playTime = 0;
+      let wavePage = 0;
+      let toastTimer = null;
+
+      function loadScenario(key) {
+        try {
+          const saved = localStorage.getItem(storagePrefix + key);
+          if (saved) return JSON.parse(saved);
+        } catch (e) {}
+        return deepClone(templates[key] || templates.referral);
+      }
+
+      function saveScenario() {
+        try {
+          localStorage.setItem(storagePrefix + currentKey, JSON.stringify(current));
+          $('#saveStatus').textContent = 'Saved';
+          toast('Scenario saved locally');
+        } catch (e) {
+          toast('Local save unavailable in this browser');
+        }
+      }
+
+      function resetScenario() {
+        try { localStorage.removeItem(storagePrefix + currentKey); } catch (e) {}
+        current = deepClone(templates[currentKey] || templates.referral);
+        outlineOn = false;
+        playTime = 0;
+        stopPlayback();
+        renderAll();
+        $('#saveStatus').textContent = 'Template reset';
+        toast('Template reset');
+      }
+
+      function toast(message) {
+        const el = $('#toast');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+      }
+
+      function scenarioLabel(key) {
+        return templates[key]?.label || current.label || 'Imported scenario';
+      }
+
+      function initScenarioSelect() {
+        const select = $('#scenarioSelect');
+        select.innerHTML = '';
+        Object.entries(templates).forEach(([key, value]) => {
+          const opt = document.createElement('option');
+          opt.value = key; opt.textContent = value.label;
+          select.appendChild(opt);
+        });
+        select.value = currentKey;
+      }
+
+      function setPresentation(presentation) {
+        editMode = !presentation;
+        document.body.classList.toggle('presentation', presentation);
+        document.body.classList.toggle('edit-mode', editMode);
+        $('#modeToggle').textContent = presentation ? 'Edit mode' : 'Presentation mode';
+        renderEditableState();
+      }
+
+      function renderEditableState() {
+        $$('.editable-text').forEach(el => {
+          el.contentEditable = editMode ? 'true' : 'false';
+          el.spellcheck = false;
+        });
+        $$('[data-editable-insight="true"]').forEach(el => {
+          el.contentEditable = editMode ? 'true' : 'false';
+          el.spellcheck = false;
+        });
+        $$('.transcript-text').forEach(el => {
+          el.contentEditable = editMode ? 'true' : 'false';
+          el.spellcheck = false;
+        });
+      }
+
+      function renderHeader() {
+        $('#interactionId').textContent = current.interactionId;
+        $('#customerName').textContent = current.customerName;
+        $('#customerPhone').textContent = current.customerPhone;
+        $('#sentimentScore').textContent = current.sentimentScore;
+        $('#sentimentTrend').textContent = current.sentimentTrend;
+        $('#recordStart').textContent = current.recordStart;
+        $('#recordEnd').textContent = current.recordEnd;
+        $('#durationText').textContent = fmtLong(current.duration);
+        $('#progressText').textContent = fmtLong(playTime);
+      }
+
+      function renderWaveform() {
+        const wf = $('#waveform');
+        wf.innerHTML = '';
+        const bars = 190;
+        for (let i = 0; i < bars; i++) {
+          const b = document.createElement('div');
+          b.className = 'wave-bar';
+          const v = 6 + Math.abs(Math.sin(i * .37) * 34 + Math.sin(i * .91) * 22 + Math.cos(i * .13) * 12);
+          b.style.height = `${Math.max(4, Math.min(88, v))}px`;
+          wf.appendChild(b);
+        }
+        updatePlayhead();
+        renderMarkers();
+      }
+
+      function markerType(ev) {
+        return ev.type === 'topic' ? 'topic' : ev.type;
+      }
+
+      function pageRange() {
+        const half = current.duration / 2;
+        return wavePage === 0 ? [0, half] : [half, current.duration];
+      }
+
+      function renderMarkers() {
+        const layer = $('#markerLayer');
+        layer.innerHTML = '';
+        const [start, end] = pageRange();
+        const topics = current.events.filter(e => e.type === 'topic');
+        const topicIndex = new Map(topics.map((e, idx) => [e.id, idx + 1]));
+        current.events.forEach(ev => {
+          if (ev.time < start || ev.time > end) return;
+          const marker = document.createElement('button');
+          marker.type = 'button';
+          marker.className = `timeline-marker ${markerType(ev)}`;
+          marker.dataset.eventId = ev.id;
+          marker.style.left = `${((ev.time - start) / Math.max(1, end - start)) * 100}%`;
+          marker.textContent = ev.type === 'topic' ? topicIndex.get(ev.id) : ev.type === 'positive' ? '▲' : ev.type === 'negative' ? '▼' : ev.type === 'empathy' ? '♥' : ev.type === 'unhelpful' ? '!' : '•••';
+          marker.title = `${ev.label} • ${fmtTime(ev.time)}`;
+          marker.addEventListener('click', e => {
+            if (editMode && e.detail === 0) return;
+            activateEvent(ev.id);
+          });
+          marker.addEventListener('pointerdown', startMarkerDrag);
+          layer.appendChild(marker);
+        });
+        $('#wavePage').textContent = wavePage + 1;
+      }
+
+      function startMarkerDrag(e) {
+        if (!editMode) return;
+        const marker = e.currentTarget;
+        const ev = current.events.find(x => x.id === marker.dataset.eventId);
+        if (!ev) return;
+        marker.setPointerCapture(e.pointerId);
+        marker.classList.add('active');
+        const layer = $('#markerLayer');
+        const rect = layer.getBoundingClientRect();
+        const [start, end] = pageRange();
+        const move = pe => {
+          let ratio = (pe.clientX - rect.left) / rect.width;
+          ratio = Math.max(0, Math.min(1, ratio));
+          const t = Math.round(start + ratio * (end - start));
+          ev.time = Math.max(0, Math.min(current.duration, t));
+          marker.style.left = `${ratio * 100}%`;
+          marker.title = `${ev.label} • ${fmtTime(ev.time)}`;
+        };
+        const up = pe => {
+          marker.classList.remove('active');
+          marker.releasePointerCapture?.(pe.pointerId);
+          marker.removeEventListener('pointermove', move);
+          marker.removeEventListener('pointerup', up);
+          renderEvents();
+          $('#saveStatus').textContent = 'Unsaved changes';
+        };
+        marker.addEventListener('pointermove', move);
+        marker.addEventListener('pointerup', up);
+      }
+
+      function updatePlayhead() {
+        const [start, end] = pageRange();
+        const p = ((playTime - start) / Math.max(1, end - start)) * 100;
+        $('#playhead').style.left = `${Math.max(0, Math.min(100, p))}%`;
+        $('#progressFill').style.width = `${Math.max(0, Math.min(100, playTime / Math.max(1,current.duration) * 100))}%`;
+        $('#progressText').textContent = fmtLong(playTime);
+      }
+
+      function renderTranscript() {
+        const scroller = $('#transcriptScroller');
+        if (outlineOn) {
+          renderOutlineTranscript(scroller);
+          return;
+        }
+        const query = $('#transcriptSearch').value.trim().toLowerCase();
+        const topicEvents = current.events.filter(e => e.type === 'topic');
+        const topicIndex = new Map(topicEvents.map((e, idx) => [e.id, idx + 1]));
+        const eventsByTranscript = new Map();
+        current.events.forEach(ev => {
+          if (!ev.transcriptId) return;
+          if (!eventsByTranscript.has(ev.transcriptId)) eventsByTranscript.set(ev.transcriptId, []);
+          eventsByTranscript.get(ev.transcriptId).push(ev);
+        });
+
+        scroller.innerHTML = '';
+        const joined = document.createElement('div');
+        joined.className = 'action-separator';
+        joined.innerHTML = `<div class="action-line"></div><div class="action-chip"><span data-editable-action="name">${escapeHtml(current.customerName)}</span> • joined</div><div class="action-line"></div>`;
+        scroller.appendChild(joined);
+        const multi = document.createElement('div');
+        multi.className = 'multi-actions';
+        multi.innerHTML = `<div class="action-line"></div><div class="action-chip">Dialect • en-US</div><div class="action-chip">Program • ${escapeHtml(current.program)}</div><div class="action-chip">Transcribed by Genesys</div><div class="action-line"></div>`;
+        scroller.appendChild(multi);
+
+        current.transcript.forEach(row => {
+          if (query && !`${row.text} ${row.speaker} ${fmtTime(row.time)}`.toLowerCase().includes(query)) return;
+          const rowEvents = eventsByTranscript.get(row.id) || [];
+          const item = document.createElement('div');
+          item.className = `transcript-entry ${row.role === 'customer' ? 'customer' : ''}`;
+          item.dataset.transcriptId = row.id;
+          item.dataset.time = row.time;
+          const iconClass = row.role === 'ivr' ? 'bot' : row.role === 'agent' ? 'agent' : '';
+          const initials = row.role === 'ivr' ? '▦' : row.role === 'agent' ? (row.speaker || 'A').slice(0,1).toUpperCase() : '◉';
+          let eventIcons = '';
+          rowEvents.forEach(ev => {
+            if (ev.type === 'topic') {
+              eventIcons += `<button type="button" class="topic-badge" data-event-jump="${ev.id}" title="${escapeAttr(ev.label)}">${topicIndex.get(ev.id)}</button>`;
+            } else {
+              const glyph = ev.type === 'positive' ? '▲' : ev.type === 'negative' ? '▼' : ev.type === 'empathy' ? '♥' : ev.type === 'unhelpful' ? '!' : '•';
+              eventIcons += `<button type="button" class="event-inline ${ev.type}" data-event-jump="${ev.id}" title="${escapeAttr(ev.label)}">${glyph}</button>`;
+            }
+          });
+          const highlighted = outlineOn && rowEvents.some(e => e.type === 'topic');
+          item.innerHTML = `
+            <div class="ts">${fmtTime(row.time)}</div>
+            <div class="speaker-icon ${iconClass}" title="${escapeAttr(row.speaker)}">${initials}</div>
+            <div class="phrase">${eventIcons}<span class="transcript-text ${highlighted ? 'highlight-topic' : ''}" data-row-id="${row.id}">${escapeHtml(row.text)}</span></div>
+            <div class="row-edit edit-only">
+              <label>Time <input class="row-time" data-row-id="${row.id}" value="${fmtTime(row.time)}" size="5"></label>
+              <label>Role <select class="row-role" data-row-id="${row.id}"><option value="customer" ${row.role==='customer'?'selected':''}>Customer</option><option value="agent" ${row.role==='agent'?'selected':''}>Agent</option><option value="ivr" ${row.role==='ivr'?'selected':''}>IVR / Bot</option></select></label>
+              <label>Speaker <input class="row-speaker" data-row-id="${row.id}" value="${escapeAttr(row.speaker)}"></label>
+              <button type="button" class="tiny-btn danger delete-row" data-row-id="${row.id}">Delete</button>
+            </div>`;
+          scroller.appendChild(item);
+        });
+        const add = document.createElement('button');
+        add.type = 'button'; add.className = 'add-transcript edit-only'; add.id = 'addTranscriptBtn'; add.textContent = '+ Add transcript line';
+        scroller.appendChild(add);
+
+        $$('[data-event-jump]', scroller).forEach(btn => btn.addEventListener('click', () => { sideTab='events'; renderSideTabs(); renderEvents(); activateEvent(btn.dataset.eventJump); }));
+        $$('.transcript-text', scroller).forEach(el => {
+          el.contentEditable = editMode ? 'true' : 'false';
+          el.addEventListener('input', () => {
+            const row = current.transcript.find(r => r.id === el.dataset.rowId);
+            if (row) row.text = el.textContent;
+            $('#saveStatus').textContent = 'Unsaved changes';
+          });
+        });
+        $$('.row-time', scroller).forEach(input => input.addEventListener('change', () => {
+          const row = current.transcript.find(r => r.id === input.dataset.rowId);
+          if (!row) return;
+          row.time = Math.min(current.duration, parseTime(input.value));
+          input.value = fmtTime(row.time);
+          renderTranscript();
+        }));
+        $$('.row-role', scroller).forEach(input => input.addEventListener('change', () => {
+          const row = current.transcript.find(r => r.id === input.dataset.rowId); if (!row) return; row.role=input.value; renderTranscript();
+        }));
+        $$('.row-speaker', scroller).forEach(input => input.addEventListener('change', () => {
+          const row = current.transcript.find(r => r.id === input.dataset.rowId); if (!row) return; row.speaker=input.value; renderTranscript();
+        }));
+        $$('.delete-row', scroller).forEach(btn => btn.addEventListener('click', () => {
+          current.transcript = current.transcript.filter(r => r.id !== btn.dataset.rowId);
+          current.events.forEach(ev => { if (ev.transcriptId === btn.dataset.rowId) ev.transcriptId = null; });
+          renderAll();
+        }));
+        $('#addTranscriptBtn')?.addEventListener('click', () => {
+          const last = current.transcript[current.transcript.length - 1];
+          current.transcript.push({id:uid('t'),time:Math.min(current.duration, (last?.time||0)+10),role:'agent',speaker:'Agent',text:'New transcript line'});
+          renderTranscript();
+          scroller.scrollTop = scroller.scrollHeight;
+        });
+      }
+
+      function renderOutlineTranscript(scroller) {
+        scroller.innerHTML = '';
+        const query = $('#transcriptSearch')?.value.trim().toLowerCase() || '';
+        const joined = document.createElement('div');
+        joined.className = 'action-separator';
+        joined.innerHTML = `<div class="action-line"></div><div class="action-chip"><span>${escapeHtml(current.customerName)}</span> • joined</div><div class="action-line"></div>`;
+        scroller.appendChild(joined);
+        const multi = document.createElement('div');
+        multi.className = 'multi-actions';
+        multi.innerHTML = `<div class="action-line"></div><div class="action-chip">Dialect • en-US</div><div class="action-chip">Program • ${escapeHtml(current.program)}</div><div class="action-chip">Transcribed by Genesys</div><div class="action-line"></div>`;
+        scroller.appendChild(multi);
+
+        const segments = deepClone(outlineTemplates[currentKey] || outlineTemplates.referral);
+        const topicEvents = current.events.filter(e => e.type === 'topic');
+        const topicIndex = new Map(topicEvents.map((e, idx) => [e.id, idx + 1]));
+
+        segments.forEach((seg, idx) => {
+          const segEvents = current.events.filter(e => e.time >= seg.start && e.time <= Math.min(current.duration, seg.end));
+          const segRows = current.transcript.filter(r => r.time >= seg.start && r.time <= Math.min(current.duration, seg.end));
+          if (query && !(`${seg.title} ${seg.desc} ${segRows.map(r => r.text).join(' ')}`).toLowerCase().includes(query)) return;
+          const topics = segEvents.filter(e => e.type === 'topic');
+          const positive = segEvents.filter(e => e.type === 'positive').length;
+          const negative = segEvents.filter(e => e.type === 'negative').length;
+          const empathy = segEvents.filter(e => e.type === 'empathy').length;
+          const unhelpful = segEvents.filter(e => e.type === 'unhelpful').length;
+          const wrap = document.createElement('section');
+          wrap.className = `outline-segment ${idx === 0 ? 'outline-segment-first' : ''}`;
+          const shownTopics = topics.slice(0, 3);
+          const overflow = Math.max(0, topics.length - shownTopics.length);
+          wrap.innerHTML = `
+            <div class="outline-segment-header">
+              <div class="outline-left">
+                <div class="outline-title">${escapeHtml(seg.title)}</div>
+                <div class="outline-description">${escapeHtml(seg.desc)}</div>
+              </div>
+              <div class="outline-right">
+                <div class="outline-event-icons">
+                  ${shownTopics.map(ev => `<button type="button" class="topic-badge outline-topic" data-event-jump="${ev.id}" title="${escapeAttr(ev.label)}">${topicIndex.get(ev.id)}</button>`).join('')}
+                  ${overflow ? `<span class="outline-overflow">+${overflow} topic${overflow === 1 ? '' : 's'}</span>` : ''}
+                  ${positive ? `<span class="outline-count positive"><strong>${positive}</strong><span class="outline-sentiment-icon">▲</span></span>` : ''}
+                  ${negative ? `<span class="outline-count negative"><strong>${negative}</strong><span class="outline-sentiment-icon">▼</span></span>` : ''}
+                  ${empathy ? `<span class="outline-count empathy"><strong>${empathy}</strong><span class="outline-sentiment-icon">♥</span></span>` : ''}
+                  ${unhelpful ? `<span class="outline-count unhelpful"><strong>${unhelpful}</strong><span class="outline-sentiment-icon">!</span></span>` : ''}
+                </div>
+                <button type="button" class="outline-expand" aria-expanded="false" aria-label="Expand segment"><span>⌄</span></button>
+              </div>
+            </div>
+            <div class="outline-expanded hidden">
+              ${segRows.map(row => `<div class="outline-transcript-line ${row.role === 'customer' ? 'customer' : ''}" data-transcript-id="${row.id}"><span class="outline-time">${fmtTime(row.time)}</span><span class="outline-speaker">${escapeHtml(row.speaker)}</span><span>${escapeHtml(row.text)}</span></div>`).join('')}
+            </div>`;
+          scroller.appendChild(wrap);
+        });
+
+        $$('.outline-expand', scroller).forEach(btn => btn.addEventListener('click', () => {
+          const body = btn.closest('.outline-segment').querySelector('.outline-expanded');
+          const expanded = !body.classList.contains('hidden');
+          body.classList.toggle('hidden', expanded);
+          btn.setAttribute('aria-expanded', String(!expanded));
+          btn.classList.toggle('open', !expanded);
+        }));
+        $$('[data-event-jump]', scroller).forEach(btn => btn.addEventListener('click', () => {
+          sideTab = 'events';
+          renderSideTabs();
+          renderEvents();
+          activateEvent(btn.dataset.eventJump);
+        }));
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+      }
+      function escapeAttr(value) { return escapeHtml(value).replace(/'/g,'&#39;'); }
+
+      function renderInsights() {
+        const p = $('#insightsPanel');
+        const i = current.insights;
+        p.innerHTML = `
+          <div class="ai-label">✦ AI Powered</div>
+          ${current.virtualAgent ? '<div class="virtual-agent">▦ A virtual agent participated in this interaction.</div>' : ''}
+          <div class="insight-block">
+            <div class="insight-heading">✦ Interaction Summary ⓘ</div>
+            <div class="insight-text clamped" data-expandable data-editable-insight="true" data-insight-path="summary">${escapeHtml(i.summary)}</div>
+            <button type="button" class="show-more" data-show-more>Show More</button>
+          </div>
+          <div class="insight-heading">✦ Insights</div>
+          ${insightSection('Reason for Contact','reasonTitle','reasonDesc')}
+          ${insightSection('Resolution','resolutionTitle','resolutionDesc')}
+          ${insightSection('Action Items','actionTitle','actionDesc')}
+          <div class="insight-block">
+            <div class="insight-subheading">Reason for Sentiment</div>
+            ${(i.sentiments||[]).map((s,idx)=>`
+              <div class="sentiment-item">
+                <div class="sentiment-title"><span class="sentiment-dot ${s.type}">${s.type==='positive'?'▲':'▼'}</span><span data-editable-insight="true" data-sentiment-index="${idx}" data-sentiment-field="title">${escapeHtml(s.title)}</span></div>
+                <div class="insight-text clamped" data-expandable data-editable-insight="true" data-sentiment-index="${idx}" data-sentiment-field="desc">${escapeHtml(s.desc)}</div>
+                <button type="button" class="show-more" data-show-more>Show More</button>
+              </div>`).join('')}
+          </div>
+          <div class="agent-summary">
+            <div class="insight-heading">✦ Agent Summaries</div>
+            ${(i.agentSummaries||[]).map((a,idx)=>`<details ${idx===0?'open':''}><summary><span data-editable-insight="true" data-agent-index="${idx}" data-agent-field="name">${escapeHtml(a.name)}</span></summary><div class="ai-generated">✦ AI generated</div><div class="insight-text" style="margin-top:8px" data-editable-insight="true" data-agent-index="${idx}" data-agent-field="text">${escapeHtml(a.text)}</div></details>`).join('')}
+          </div>`;
+        bindInsightEditing();
+      }
+
+      function insightSection(heading,titleKey,descKey) {
+        const i = current.insights;
+        return `<div class="insight-block">
+          <div class="insight-subheading">${heading}</div>
+          <div class="insight-text" style="font-weight:800" data-editable-insight="true" data-insight-path="${titleKey}">${escapeHtml(i[titleKey])}</div>
+          <div class="insight-text clamped" data-expandable data-editable-insight="true" data-insight-path="${descKey}">${escapeHtml(i[descKey])}</div>
+          <button type="button" class="show-more" data-show-more>Show More</button>
+        </div>`;
+      }
+
+      function bindInsightEditing() {
+        const p = $('#insightsPanel');
+        $$('[data-show-more]', p).forEach(btn => btn.addEventListener('click', () => {
+          const target = btn.previousElementSibling;
+          target.classList.toggle('clamped');
+          btn.textContent = target.classList.contains('clamped') ? 'Show More' : 'Show Less';
+        }));
+        $$('[data-editable-insight="true"]', p).forEach(el => {
+          el.contentEditable = editMode ? 'true' : 'false';
+          el.spellcheck = false;
+          el.addEventListener('input', () => {
+            if (el.dataset.insightPath) current.insights[el.dataset.insightPath] = el.textContent;
+            if (el.dataset.sentimentIndex != null) current.insights.sentiments[Number(el.dataset.sentimentIndex)][el.dataset.sentimentField] = el.textContent;
+            if (el.dataset.agentIndex != null) current.insights.agentSummaries[Number(el.dataset.agentIndex)][el.dataset.agentField] = el.textContent;
+            $('#saveStatus').textContent = 'Unsaved changes';
+          });
+        });
+      }
+
+      function renderEvents() {
+        const p = $('#eventsPanel');
+        const typeCount = {topic:0};
+        const topicEvents = current.events.filter(e=>e.type==='topic');
+        const topicIndex = new Map(topicEvents.map((e,idx)=>[e.id,idx+1]));
+        p.innerHTML = `
+          <div class="event-filters">
+            ${filterButton('topic','Topics')}
+            ${filterButton('positive','Positive')}
+            ${filterButton('negative','Negative')}
+            ${filterButton('empathy','Empathetic')}
+            ${filterButton('unhelpful','Unhelpful')}
+          </div>
+          <div class="event-list" id="eventList"></div>
+          <button type="button" class="add-event edit-only" id="addEventBtn">+ Add topic / event</button>`;
+        const list = $('#eventList', p);
+        current.events.slice().sort((a,b)=>a.time-b.time).forEach(ev => {
+          if (!filterState[ev.type]) return;
+          const row = document.createElement('div');
+          row.className = 'event-row'; row.dataset.eventId = ev.id;
+          const iconText = ev.type==='topic' ? topicIndex.get(ev.id) : ev.type==='positive'?'▲':ev.type==='negative'?'▼':ev.type==='empathy'?'♥':ev.type==='unhelpful'?'!':'•';
+          row.innerHTML = `
+            <div class="event-icon ${ev.type}">${iconText}</div>
+            <div class="event-label">${escapeHtml(ev.label)}</div>
+            <div class="event-time">${fmtTime(ev.time)}</div>
+            <div class="event-edit edit-only">
+              <input class="event-label-input" value="${escapeAttr(ev.label)}" aria-label="Event label">
+              <select class="event-type-input" aria-label="Event type"><option value="topic" ${ev.type==='topic'?'selected':''}>Topic</option><option value="positive" ${ev.type==='positive'?'selected':''}>Positive</option><option value="negative" ${ev.type==='negative'?'selected':''}>Negative</option><option value="empathy" ${ev.type==='empathy'?'selected':''}>Empathetic</option><option value="unhelpful" ${ev.type==='unhelpful'?'selected':''}>Unhelpful</option><option value="annotation" ${ev.type==='annotation'?'selected':''}>Annotation</option></select>
+              <input class="event-time-input" value="${fmtTime(ev.time)}" aria-label="Event time">
+              <button type="button" class="tiny-btn danger delete-event">Delete</button>
+            </div>`;
+          row.addEventListener('click', e => {
+            if (e.target.closest('.event-edit')) return;
+            activateEvent(ev.id);
+          });
+          $('.event-label-input',row).addEventListener('input', e => { ev.label=e.target.value; $('.event-label',row).textContent=ev.label; renderMarkers(); $('#saveStatus').textContent='Unsaved changes'; });
+          $('.event-type-input',row).addEventListener('change', e => { ev.type=e.target.value; renderEvents(); renderTranscript(); renderMarkers(); });
+          $('.event-time-input',row).addEventListener('change', e => { ev.time=Math.min(current.duration,parseTime(e.target.value)); renderEvents(); renderMarkers(); });
+          $('.delete-event',row).addEventListener('click', () => { current.events=current.events.filter(x=>x.id!==ev.id); renderEvents(); renderMarkers(); renderTranscript(); });
+          list.appendChild(row);
+        });
+        $$('.filter-btn',p).forEach(btn => btn.addEventListener('click', () => {
+          const type=btn.dataset.filterType; filterState[type]=!filterState[type]; renderEvents();
+        }));
+        $('#addEventBtn',p)?.addEventListener('click', () => {
+          const ev={id:uid('e'),type:'topic',label:'New topic',time:Math.min(current.duration,Math.round(playTime||30)),transcriptId:nearestTranscriptId(playTime||30)};
+          current.events.push(ev); renderEvents(); renderMarkers(); renderTranscript();
+        });
+      }
+
+      function filterButton(type,label) {
+        const cls = type==='topic'?'topics':type;
+        return `<button type="button" class="filter-btn ${cls} ${filterState[type]?'':'off'}" data-filter-type="${type}">${label}</button>`;
+      }
+
+      function nearestTranscriptId(time) {
+        if (!current.transcript.length) return null;
+        return current.transcript.reduce((best,row) => Math.abs(row.time-time) < Math.abs(best.time-time) ? row : best, current.transcript[0]).id;
+      }
+
+      function activateEvent(id) {
+        const ev=current.events.find(e=>e.id===id); if(!ev) return;
+        const rowId=ev.transcriptId || nearestTranscriptId(ev.time);
+        const row=$(`[data-transcript-id="${CSS.escape(rowId)}"]`);
+        if (row) {
+          row.classList.remove('flash');
+          row.scrollIntoView({behavior:'smooth',block:'center'});
+          requestAnimationFrame(()=>row.classList.add('flash'));
+          setTimeout(()=>row.classList.remove('flash'),950);
+        }
+        $$('.timeline-marker').forEach(m=>m.classList.toggle('active',m.dataset.eventId===id));
+        if (sideTab==='events') {
+          const er=$(`.event-row[data-event-id="${CSS.escape(id)}"]`); er?.scrollIntoView({behavior:'smooth',block:'nearest'});
+        }
+      }
+
+      function renderSideTabs() {
+        $$('[data-side-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.sideTab===sideTab));
+        $('#insightsPanel').classList.toggle('hidden',sideTab!=='insights');
+        $('#eventsPanel').classList.toggle('hidden',sideTab!=='events');
+        if (sideTab==='insights') renderInsights(); else renderEvents();
+      }
+
+      function renderDetail() {
+        const container=$('#detailContent');
+        $$('[data-detail-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.detailTab===detailTab));
+        if(detailTab==='transcript') {
+          container.innerHTML=`<section class="interaction-view" id="transcriptView">
+            <div class="transcript-pane">
+              <div class="transcript-toolbar">
+                <span class="lock">♧</span>
+                <label class="transcript-search"><span class="search-icon"></span><input id="transcriptSearch" type="search" placeholder="Search" /></label>
+                <div class="toolbar-spacer"></div>
+                <div class="ai-outline"><button id="outlineToggle" class="mini-toggle ${outlineOn?'on':''}" type="button" aria-label="Toggle AI outline"></button><span>AI outline</span></div>
+                <button class="tool-icon" type="button" title="Expand transcript">↗</button>
+                <button class="tool-icon" type="button" title="Language tools">A▧</button>
+                <button class="tool-icon" id="copyTranscriptBtn" type="button" title="Copy transcript">▣</button>
+              </div>
+              <div class="transcript-scroller ${outlineOn?'':'outline-off'}" id="transcriptScroller"></div>
+            </div>
+            <aside class="sidepanel">
+              <div class="side-tabs"><button class="side-tab ${sideTab==='insights'?'active':''}" data-side-tab="insights" type="button">AI Insights</button><button class="side-tab ${sideTab==='events'?'active':''}" data-side-tab="events" type="button">Events</button></div>
+              <div class="side-scroll" id="sideScroll"><div id="insightsPanel"></div><div id="eventsPanel" class="hidden"></div></div>
+            </aside>
+          </section>`;
+          bindTranscriptView();
+        } else {
+          const names={details:'Details',timeline:'Timeline',quality:'Quality Summary',audit:'Audit Trail',journeys:'Customer Journeys'};
+          container.innerHTML=`<div class="placeholder"><h3>${names[detailTab]||'Interaction'}</h3><p>This demo replica focuses on the Transcript, AI Insights, Events, and recording timeline. This tab is intentionally lightweight so the navigation remains clickable without adding unrelated demo content.</p></div>`;
+        }
+      }
+
+      function bindTranscriptView() {
+        $('[data-side-tab="insights"]').addEventListener('click',()=>{sideTab='insights';renderSideTabs();});
+        $('[data-side-tab="events"]').addEventListener('click',()=>{sideTab='events';renderSideTabs();});
+        $('#transcriptSearch').addEventListener('input',renderTranscript);
+        $('#outlineToggle').addEventListener('click',()=>{outlineOn=!outlineOn;$('#outlineToggle').classList.toggle('on',outlineOn);$('#transcriptScroller').classList.toggle('outline-off',!outlineOn);renderTranscript();});
+        $('#copyTranscriptBtn').addEventListener('click',copyTranscript);
+        renderTranscript(); renderSideTabs(); renderEditableState();
+      }
+
+      function copyTranscript() {
+        const text=current.transcript.map(r=>`${fmtTime(r.time)} ${r.speaker}: ${r.text}`).join('\n');
+        if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(()=>toast('Transcript copied')).catch(()=>fallbackCopy(text));
+        else fallbackCopy(text);
+      }
+      function fallbackCopy(text) {
+        const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Transcript copied');}catch(e){toast('Copy unavailable');}ta.remove();
+      }
+
+      function renderAll() {
+        renderHeader();
+        renderWaveform();
+        renderDetail();
+        renderEditableState();
+      }
+
+      function syncHeaderEdits() {
+        const map={customerName:'customerName',customerPhone:'customerPhone',sentimentScore:'sentimentScore',sentimentTrend:'sentimentTrend',recordStart:'recordStart',recordEnd:'recordEnd'};
+        Object.entries(map).forEach(([id,key])=>{
+          const el=$('#'+id);
+          el.addEventListener('input',()=>{current[key]=el.textContent.trim();$('#saveStatus').textContent='Unsaved changes';});
+        });
+      }
+
+      function togglePlayback() {
+        if(playTimer){stopPlayback();return;}
+        $('#playBtn').classList.add('playing');
+        playTimer=setInterval(()=>{
+          playTime+=1;
+          if(playTime>=current.duration){playTime=0;stopPlayback();}
+          const half=current.duration/2;
+          const newPage=playTime>half?1:0;
+          if(newPage!==wavePage){wavePage=newPage;renderMarkers();}
+          updatePlayhead();
+        },220);
+      }
+      function stopPlayback(){if(playTimer){clearInterval(playTimer);playTimer=null;}$('#playBtn')?.classList.remove('playing');}
+
+      function addAnnotation() {
+        const val=$('#annotationInput').value.trim(); if(!val){toast('Enter an annotation first');return;}
+        current.events.push({id:uid('ann'),type:'annotation',label:val,time:Math.min(current.duration,Math.round(playTime)),transcriptId:nearestTranscriptId(playTime)});
+        $('#annotationInput').value=''; renderMarkers(); if(sideTab==='events')renderEvents(); toast('Annotation added');
+      }
+
+      function exportJson() {
+        const blob=new Blob([JSON.stringify(current,null,2)],{type:'application/json'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${currentKey}-interaction-scenario.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('Scenario exported');
+      }
+
+      function importJson(file) {
+        const reader=new FileReader();
+        reader.onload=()=>{
+          try {
+            const obj=JSON.parse(reader.result);
+            if(!obj.transcript||!obj.insights||!obj.events) throw new Error('Invalid scenario');
+            currentKey='referral';
+            current=obj;
+            $('#scenarioSelect').value='referral';
+            playTime=0; wavePage=0; stopPlayback(); renderAll(); $('#saveStatus').textContent='Imported, unsaved'; toast('Scenario imported');
+          } catch(e){toast('Could not import that JSON file');}
+        };
+        reader.readAsText(file);
+      }
+
+      function bindGlobal() {
+        $('#scenarioSelect').addEventListener('change',e=>{currentKey=e.target.value;current=loadScenario(currentKey);outlineOn=false;playTime=0;wavePage=0;stopPlayback();sideTab='insights';detailTab='transcript';filterState={topic:true,positive:true,negative:true,empathy:true,unhelpful:true,annotation:true};renderAll();$('#saveStatus').textContent='Template loaded';});
+        $('#modeToggle').addEventListener('click',()=>setPresentation(editMode));
+        $('#saveBtn').addEventListener('click',saveScenario);
+        $('#resetBtn').addEventListener('click',resetScenario);
+        $('#exportBtn').addEventListener('click',exportJson);
+        $('#importBtn').addEventListener('click',()=>$('#importFile').click());
+        $('#importFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(f)importJson(f);e.target.value='';});
+        $('#playBtn').addEventListener('click',togglePlayback);
+        $('#annotateBtn').addEventListener('click',addAnnotation);
+        $('#prevWave').addEventListener('click',()=>{wavePage=Math.max(0,wavePage-1);renderMarkers();updatePlayhead();});
+        $('#nextWave').addEventListener('click',()=>{wavePage=Math.min(1,wavePage+1);renderMarkers();updatePlayhead();});
+        $('#copyIdBtn').addEventListener('click',()=>{if(navigator.clipboard?.writeText)navigator.clipboard.writeText(current.interactionId).then(()=>toast('Interaction ID copied')).catch(()=>fallbackCopy(current.interactionId));else fallbackCopy(current.interactionId);});
+        $('#scheduleBtn').addEventListener('click',()=>toast('Coaching action opened in demo mode'));
+        $('#menuBtn').addEventListener('click',()=>toast('Menu opened in demo mode'));
+        $$('[data-top-action]').forEach(btn => btn.addEventListener('click', () => toast(`${btn.dataset.topAction} opened in demo mode`)));
+        const internalPopup = $('#internalPopup');
+        const openInternal = () => { internalPopup.classList.remove('hidden'); $('#internalTrigger').setAttribute('aria-expanded','true'); };
+        const closeInternal = () => { internalPopup.classList.add('hidden'); $('#internalTrigger').setAttribute('aria-expanded','false'); };
+        $('#internalHeading').addEventListener('click', e => { e.stopPropagation(); internalPopup.classList.contains('hidden') ? openInternal() : closeInternal(); });
+        $('#internalTrigger').addEventListener('click', e => { e.stopPropagation(); internalPopup.classList.contains('hidden') ? openInternal() : closeInternal(); });
+        $('#internalPopupClose').addEventListener('click', e => { e.stopPropagation(); closeInternal(); });
+        internalPopup.addEventListener('click', e => e.stopPropagation());
+        document.addEventListener('click', closeInternal);
+        $$('[data-detail-tab]').forEach(btn=>btn.addEventListener('click',()=>{detailTab=btn.dataset.detailTab;renderDetail();}));
+        document.addEventListener('keydown',e=>{
+          if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==='e'){e.preventDefault();setPresentation(false);}
+          if(e.key==='Escape') $('#internalPopup')?.classList.add('hidden');
+        });
+      }
+
+      initScenarioSelect();
+      bindGlobal();
+      syncHeaderEdits();
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
