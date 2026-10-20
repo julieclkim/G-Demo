@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Interaction Details Demo Builder</title>
+  <title>Genesys Interaction Detail Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
       --orange: #ff4f22;
       --sidebar: 322px;
       --participant: 258px;
-      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-family: Roboto, Arial, sans-serif;
       color: var(--ink);
     }
 
@@ -460,6 +460,56 @@
       .top-action { padding:0 9px; }
     }
 
+
+
+    /* Quality Summary replica */
+    .quality-view { display:grid; grid-template-columns: 310px minmax(0,1fr); min-height: 560px; border-top:1px solid #e2e6ee; background:#fff; }
+    .quality-left { border-right:1px solid #d7dce5; background:#f7f8fb; padding:16px 14px; }
+    .quality-left-title { font-size:14px; font-weight:700; color:#2e394c; margin-bottom:12px; }
+    .evaluation-list-card { background:#fff; border:1px solid #c8ceda; border-radius:4px; box-shadow:0 1px 2px rgba(32,59,115,.08); overflow:hidden; }
+    .evaluation-list-card .eval-row { padding:12px; border-bottom:1px solid #e6e9ef; cursor:pointer; }
+    .evaluation-list-card .eval-row:last-child { border-bottom:0; }
+    .evaluation-list-card .eval-row.active { background:#eef3ff; border-left:3px solid #2143a2; padding-left:9px; }
+    .eval-row-title { font-weight:700; color:#2e394c; font-size:13px; line-height:18px; }
+    .eval-row-meta { margin-top:5px; color:#596373; font-size:11px; line-height:16px; }
+    .eval-row-score { display:flex; align-items:center; gap:7px; margin-top:8px; font-weight:700; color:#2e394c; }
+    .score-dot { width:9px; height:9px; border-radius:50%; background:#3c8527; display:inline-block; }
+    .quality-main { min-width:0; background:#fff; }
+    .quality-header { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; padding:18px 22px 14px; border-bottom:1px solid #d7dce5; }
+    .quality-header h2 { margin:0; font-size:18px; line-height:25px; color:#2e394c; }
+    .quality-sub { color:#596373; font-size:12px; margin-top:3px; }
+    .quality-header-actions { display:flex; align-items:center; gap:8px; }
+    .quality-pill { border-radius:12px; padding:3px 9px; background:#e7f4e3; color:#2f7023; font-weight:700; font-size:11px; }
+    .quality-scoreboard { display:grid; grid-template-columns: 160px 1fr; gap:0; border-bottom:1px solid #d7dce5; background:#fbfcfe; }
+    .score-big { padding:18px 22px; border-right:1px solid #e1e5ec; }
+    .score-big .label { color:#596373; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .score-big .value { font-size:32px; font-weight:700; color:#2e394c; margin-top:4px; line-height:38px; }
+    .score-breakdown { display:flex; align-items:center; gap:28px; padding:16px 22px; }
+    .score-breakdown-item { min-width:110px; }
+    .score-breakdown-item .k { font-size:11px; color:#596373; }
+    .score-breakdown-item .v { margin-top:3px; font-size:14px; font-weight:700; color:#2e394c; }
+    .auto-score-strip { display:flex; align-items:center; gap:9px; padding:11px 22px; border-bottom:1px solid #d7dce5; color:#2e394c; font-size:12px; }
+    .ai-score-icon { width:26px; height:26px; border-radius:4px; display:grid; place-items:center; color:#203b73; background:linear-gradient(132deg,#bbe5e8,#deeaff); font-weight:700; }
+    .quality-form { padding:0 22px 28px; max-height:520px; overflow:auto; }
+    .quality-section { border-bottom:1px solid #d7dce5; padding:18px 0 12px; }
+    .quality-section:last-child { border-bottom:0; }
+    .quality-section-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; }
+    .quality-section-title { font-weight:700; color:#2e394c; font-size:14px; }
+    .quality-section-score { font-weight:700; color:#2e394c; font-size:12px; }
+    .quality-question { display:grid; grid-template-columns: minmax(0,1fr) auto; gap:16px; align-items:start; padding:10px 0; }
+    .q-title { color:#2e394c; font-size:12px; line-height:18px; }
+    .q-help { color:#77808f; font-size:11px; margin-top:3px; line-height:16px; }
+    .auto-badge { display:inline-flex; gap:4px; align-items:center; margin-left:7px; color:#476189; font-size:10px; font-weight:700; }
+    .answer-group { display:flex; gap:4px; }
+    .answer-btn { min-width:42px; height:28px; border:1px solid #aab1bf; background:#fff; border-radius:4px; color:#414b5d; font-size:11px; cursor:pointer; }
+    .answer-btn.selected.yes { background:#e4f3df; color:#2d6e23; border-color:#6da85e; font-weight:700; }
+    .answer-btn.selected.no { background:#fde8ec; color:#9c2237; border-color:#d98494; font-weight:700; }
+    .answer-btn.selected.na { background:#edf0f5; color:#586273; border-color:#afb5c0; font-weight:700; }
+    .quality-comment { margin-top:10px; border:1px solid #c8ceda; background:#fff; border-radius:4px; min-height:52px; padding:8px 10px; font-size:12px; color:#414b5d; }
+    .quality-comment-label { font-size:11px; font-weight:700; color:#596373; margin-bottom:5px; }
+    body:not(.edit-mode) .quality-question .answer-btn { pointer-events:none; }
+    body.edit-mode .q-title[contenteditable="true"], body.edit-mode .quality-comment[contenteditable="true"] { outline:1px dashed #7d98d3; outline-offset:2px; }
+
   </style>
 </head>
 <body class="edit-mode">
@@ -474,7 +524,7 @@
     <input id="importFile" class="hidden" type="file" accept="application/json" />
     <span class="presentation-hint">Ctrl+Shift+E returns to edit mode</span>
     <div class="spacer"></div>
-    <div class="status" id="saveStatus">Template loaded</div>
+    <div class="status" id="saveStatus">Saved for this session</div>
   </div>
 
   <div class="app-shell" id="appShell">
@@ -853,50 +903,49 @@
           ]
         },
 
-        billing: {
-          label: 'Billing / payment question',
-          interactionId: 'e616857b-52d8-43ab-90d7-259109f241aa',
-          customerName: 'Roberts, Maya', customerPhone: '+1 949-555-0136', sentimentScore: '+19', sentimentTrend: 'Improving',
+        triage: {
+          label: 'Symptom call / nurse triage routing',
+          interactionId: 'e616857b-52d8-43ab-90d7-259109f2a82e',
+          customerName: 'Roberts, Maya', customerPhone: '+1 949-555-0136', sentimentScore: '+17', sentimentTrend: 'Improving',
           recordStart: 'Tue, October 20, 2026 at 2:21:31 PM', recordEnd: 'Tue, October 20, 2026 at 2:26:47 PM', duration: 316,
           program: 'Patient Access Center - English', virtualAgent: false,
           transcript:[
-            {id:'b1',time:5,role:'agent',speaker:'Jordan',text:'Thank you for calling Patient Services. My name is Jordan. How can I help?'},
-            {id:'b2',time:15,role:'customer',speaker:'Maya Roberts',text:'I paid the bill from my doctor, but now I have another bill from the hospital. I am worried I am being charged twice.'},
-            {id:'b3',time:36,role:'agent',speaker:'Jordan',text:'I can review the account with you and explain what each balance is for.'},
-            {id:'b4',time:58,role:'customer',speaker:'Maya Roberts',text:'This is really confusing. I thought the first payment closed everything out.'},
-            {id:'b5',time:74,role:'agent',speaker:'Jordan',text:'I understand. I see the first payment applied to the professional services bill. The remaining statement is the facility charge from the same visit.'},
-            {id:'b6',time:104,role:'agent',speaker:'Jordan',text:'The two charges are separate, and I do not see a duplicate line item. The facility balance is $238.40.'},
-            {id:'b7',time:128,role:'customer',speaker:'Maya Roberts',text:'Okay, that makes more sense. I just did not know they would come separately.'},
-            {id:'b8',time:148,role:'customer',speaker:'Maya Roberts',text:'Can I split that balance into payments?'},
-            {id:'b9',time:158,role:'agent',speaker:'Jordan',text:'Yes. This balance is eligible for a three-month payment plan. I can set that up now or send you the secure link.'},
-            {id:'b10',time:182,role:'customer',speaker:'Maya Roberts',text:'Please send the link. I would rather set it up myself tonight.'},
-            {id:'b11',time:198,role:'agent',speaker:'Jordan',text:'The secure payment-plan link has been sent. It will show the monthly amount before you confirm.'},
-            {id:'b12',time:222,role:'customer',speaker:'Maya Roberts',text:'Got it. Thank you for explaining the two bills.'},
-            {id:'b13',time:239,role:'agent',speaker:'Jordan',text:'You are welcome. There is no duplicate charge on the account, and the payment-plan option is available through the link I sent.'}
+            {id:'t1',time:5,role:'agent',speaker:'Jordan',text:'Thank you for calling Northstar Health Patient Access. My name is Jordan. How can I help? '},
+            {id:'t2',time:17,role:'customer',speaker:'Maya Roberts',text:'I was hoping to make an appointment today. I have been having chest tightness since this morning and it seems a little worse now.'},
+            {id:'t3',time:36,role:'agent',speaker:'Jordan',text:'I can help get you to the right team. Because you are describing a new symptom that is getting worse, I need to connect you with our nurse triage line rather than schedule this as a routine visit.'},
+            {id:'t4',time:59,role:'customer',speaker:'Maya Roberts',text:'Okay. I was not sure if I should just wait for an appointment.'},
+            {id:'t5',time:72,role:'agent',speaker:'Jordan',text:'I understand. I am going to stay with you while I bring in the triage nurse. Before I transfer you, can I confirm the best callback number in case the call drops?'},
+            {id:'t6',time:96,role:'customer',speaker:'Maya Roberts',text:'Yes, it is the number I am calling from, 949-555-0136.'},
+            {id:'t7',time:111,role:'agent',speaker:'Jordan',text:'Thank you. I have documented the symptom you reported, when it started, that it is worsening, and your callback number so you do not have to repeat everything.'},
+            {id:'t8',time:137,role:'agent',speaker:'Jordan',text:'I have a triage nurse available now. I am connecting you directly and passing along the information we just reviewed.'},
+            {id:'t9',time:156,role:'customer',speaker:'Maya Roberts',text:'Thank you. I appreciate you not just putting me back in another queue.'},
+            {id:'t10',time:175,role:'agent',speaker:'Jordan',text:'Of course. Please stay on the line while I complete the transfer.'},
+            {id:'t11',time:193,role:'agent',speaker:'Triage Nurse',text:'Hi Maya, this is Casey, one of the triage nurses. Jordan let me know you have had chest tightness since this morning and that it has been getting worse. I am going to ask you a few questions now.'},
+            {id:'t12',time:223,role:'customer',speaker:'Maya Roberts',text:'Yes, that is right.'}
           ],
           insights:{
-            summary:'Maya Roberts called because she received a hospital bill after already paying a physician bill and was concerned she had been charged twice. The agent reviewed the account, confirmed the prior payment applied to professional services, and explained that the remaining $238.40 was a separate facility charge from the same visit. No duplicate line item was found. The balance qualified for a three-month payment plan, and a secure enrollment link was sent by SMS.',
-            reasonTitle:'Clarify separate facility and professional bills',
-            reasonDesc:'Patient believed a second statement might be a duplicate after paying a prior bill from the same visit. She also asked whether the remaining balance could be split into payments.',
-            resolutionTitle:'Resolved',
-            resolutionDesc:'Agent confirmed the statements represented different service components, verified no duplicate charge was present, and provided a three-month payment-plan option. Secure enrollment link was delivered successfully.',
-            actionTitle:'Patient to enroll in payment plan',
-            actionDesc:'No additional staff follow-up is required unless the patient has trouble using the secure link. Patient will review the monthly amount and enroll later today.',
+            summary:'Maya Roberts called Patient Access requesting a same-day appointment and reported new chest tightness that began this morning and was worsening. The access agent followed symptom-routing protocol, did not place a routine appointment, confirmed the patient callback number, documented the reported symptom and onset, and completed a warm transfer to nurse triage. The triage nurse received the context and began assessment without asking the patient to repeat the initial history.',
+            reasonTitle:'Same-day appointment request with symptom escalation',
+            reasonDesc:'Patient initially called to schedule an appointment but described a new symptom that was worsening, which required routing to clinical triage rather than routine scheduling.',
+            resolutionTitle:'Transferred to appropriate clinical resource',
+            resolutionDesc:'Agent followed non-clinical symptom-routing protocol and completed a warm transfer to nurse triage. Callback information and the patient-reported symptom context were passed with the interaction.',
+            actionTitle:'Clinical assessment in progress',
+            actionDesc:'No scheduling action should be taken until nurse triage completes assessment and determines the appropriate next step. Patient remained connected during the transfer.',
             sentiments:[
-              {type:'negative',title:'Concern about duplicate billing',desc:'Patient said the separate statements were confusing and worried she was being charged twice.'},
-              {type:'positive',title:'Billing explanation understood',desc:'Patient said the separate professional and facility charges made sense after the agent reviewed the account.'}
+              {type:'negative',title:'Uncertainty about where to seek care',desc:'Patient was unsure whether to wait for a routine appointment despite worsening symptoms.'},
+              {type:'positive',title:'Reassured by warm transfer',desc:'Patient expressed appreciation that the agent stayed on the line and transferred the context instead of sending her back to another queue.'}
             ],
-            agentSummaries:[{name:'Jordan Lee',text:'Reviewed professional and facility charges, confirmed prior payment and absence of duplicate line items, explained the remaining $238.40 facility balance, identified payment-plan eligibility, and sent a secure three-month-plan enrollment link by SMS.'}]
+            agentSummaries:[{name:'Jordan Lee',text:'Identified symptom language requiring clinical triage, avoided routine scheduling, confirmed callback number, documented patient-reported onset and worsening symptoms, and completed a warm transfer with context to the triage nurse.'}]
           },
           events:[
-            {id:'be1',type:'topic',label:'Billing Issue',time:15,transcriptId:'b2'},
-            {id:'be2',type:'negative',label:'Concern about duplicate charge',time:58,transcriptId:'b4'},
-            {id:'be3',type:'empathy',label:'Acknowledges billing confusion',time:74,transcriptId:'b5'},
-            {id:'be4',type:'topic',label:'Billing Clarification',time:104,transcriptId:'b6'},
-            {id:'be5',type:'positive',label:'Separate charges understood',time:128,transcriptId:'b7'},
-            {id:'be6',type:'topic',label:'Payment Plan',time:148,transcriptId:'b8'},
-            {id:'be7',type:'topic',label:'Secure Payment Link',time:198,transcriptId:'b11'},
-            {id:'be8',type:'topic',label:'Check for Resolution',time:239,transcriptId:'b13'}
+            {id:'te1',type:'topic',label:'Same-day Appointment Request',time:17,transcriptId:'t2'},
+            {id:'te2',type:'negative',label:'Worsening symptom concern',time:17,transcriptId:'t2'},
+            {id:'te3',type:'topic',label:'Symptom Routing',time:36,transcriptId:'t3'},
+            {id:'te4',type:'empathy',label:'Explains next step and stays connected',time:72,transcriptId:'t5'},
+            {id:'te5',type:'topic',label:'Callback Verification',time:96,transcriptId:'t6'},
+            {id:'te6',type:'topic',label:'Warm Transfer',time:137,transcriptId:'t8'},
+            {id:'te7',type:'positive',label:'Appreciation for warm transfer',time:156,transcriptId:'t9'},
+            {id:'te8',type:'topic',label:'Context Transfer',time:193,transcriptId:'t11'}
           ]
         }
       };
@@ -926,13 +975,97 @@
           {title:'Callback Commitment', desc:'The authorization team ownership is confirmed and a specific callback by noon tomorrow is created.', start:123, end:185},
           {title:'Follow-up Required', desc:'The appointment remains scheduled while the patient waits for the promised authorization update.', start:186, end:9999}
         ],
-        billing: [
-          {title:'Billing Concern', desc:'The patient reports receiving a second statement and worries that the same visit may have been billed twice.', start:0, end:73},
-          {title:'Billing Clarification', desc:'The agent distinguishes professional and facility charges and confirms there is no duplicate line item.', start:74, end:147},
-          {title:'Payment Plan', desc:'The patient asks about splitting the remaining balance and the agent explains the available payment-plan option.', start:148, end:221},
-          {title:'Resolution', desc:'A secure enrollment link is sent and the patient confirms the billing explanation resolved the concern.', start:222, end:9999}
+        triage: [
+          {title:'Appointment Request', desc:'The patient requests a same-day appointment and reports a new worsening symptom.', start:0, end:35},
+          {title:'Symptom Routing', desc:'The agent follows patient-access protocol and routes the interaction to clinical triage rather than routine scheduling.', start:36, end:110},
+          {title:'Warm Transfer', desc:'The agent confirms callback information, documents the patient-reported symptom context, and stays connected during transfer.', start:111, end:192},
+          {title:'Clinical Handoff', desc:'The triage nurse receives the context and begins assessment without requiring the patient to repeat the initial history.', start:193, end:9999}
         ]
       };
+
+
+      const qualityTemplates = {
+        referral: {
+          formName:'Patient Access - Referral Scheduling Auto Evaluation', score:96, critical:'Pass', evaluator:'Genesys Auto Evaluation', status:'Released',
+          sections:[
+            {title:'Verification & referral handling', questions:[
+              {q:'Did the agent verify the patient before discussing referral details?', a:'yes', auto:true, help:'Verification must occur before protected referral or appointment information is disclosed.'},
+              {q:'Did the agent confirm the referral was received and accurately explain its current status?', a:'yes', auto:true},
+              {q:'Did the agent check required documentation and authorization status before scheduling?', a:'yes', auto:true}
+            ]},
+            {title:'Scheduling & resolution', questions:[
+              {q:'Did the agent offer appropriate appointment options and confirm the selected date, time, provider, and location?', a:'yes', auto:true},
+              {q:'Did the agent link the referral to the appointment and provide arrival or preparation instructions?', a:'yes', auto:true},
+              {q:'Did the agent acknowledge the repeat-contact concern and confirm the issue was resolved before ending the call?', a:'yes', auto:true}
+            ]}
+          ], comment:'Strong referral ownership. The agent resolved a repeat contact in one interaction and clearly confirmed next steps.'
+        },
+        newpatient: {
+          formName:'Patient Access - New Patient Scheduling Auto Evaluation', score:94, critical:'Pass', evaluator:'Genesys Auto Evaluation', status:'Released',
+          sections:[
+            {title:'Discovery & eligibility', questions:[
+              {q:'Did the agent capture the patient location and provider preferences?', a:'yes', auto:true},
+              {q:'Did the agent verify that the selected provider was accepting new patients and participating with the patient plan?', a:'yes', auto:true},
+              {q:'Did the agent avoid making clinical promises about medication continuation?', a:'yes', auto:true}
+            ]},
+            {title:'Appointment & onboarding', questions:[
+              {q:'Did the agent confirm the appointment date, time, provider, and location?', a:'yes', auto:true},
+              {q:'Did the agent send registration and outside-record instructions?', a:'yes', auto:true},
+              {q:'Did the agent document the medication continuity concern for provider review?', a:'yes', auto:true}
+            ]}
+          ], comment:'The agent matched patient preferences while keeping the medication discussion appropriately non-clinical.'
+        },
+        reschedule: {
+          formName:'Patient Access - Appointment Management Auto Evaluation', score:92, critical:'Pass', evaluator:'Genesys Auto Evaluation', status:'Released',
+          sections:[
+            {title:'Appointment management', questions:[
+              {q:'Did the agent confirm the existing appointment before making changes?', a:'yes', auto:true},
+              {q:'Did the agent explore alternate locations or availability before pushing the visit out significantly?', a:'yes', auto:true},
+              {q:'Did the agent clearly confirm which original appointment was released?', a:'yes', auto:true}
+            ]},
+            {title:'Patient experience', questions:[
+              {q:'Did the agent acknowledge the transportation barrier and the patient concern about additional delay?', a:'yes', auto:true},
+              {q:'Did the agent offer an appropriate waitlist or cancellation-list option?', a:'yes', auto:true},
+              {q:'Did the agent send updated location and appointment details?', a:'yes', auto:true}
+            ]}
+          ], comment:'The agent used alternate-site availability to minimize delay and preserved the patient preferred-location option through the cancellation list.'
+        },
+        authorization: {
+          formName:'Patient Access - Authorization Status Auto Evaluation', score:88, critical:'Pass', evaluator:'Genesys Auto Evaluation', status:'Released',
+          sections:[
+            {title:'Status accuracy', questions:[
+              {q:'Did the agent distinguish a pending authorization from a denial?', a:'yes', auto:true},
+              {q:'Did the agent avoid guaranteeing payer approval or final patient responsibility?', a:'yes', auto:true},
+              {q:'Did the agent confirm whether the scheduled appointment should remain in place?', a:'yes', auto:true}
+            ]},
+            {title:'Follow-up ownership', questions:[
+              {q:'Did the agent acknowledge the patient financial concern?', a:'yes', auto:true},
+              {q:'Did the agent create a specific follow-up commitment with a clear time?', a:'yes', auto:true},
+              {q:'Was final authorization obtained during the interaction?', a:'no', auto:true, help:'A No response is expected here because the payer decision remained pending.'}
+            ]}
+          ], comment:'Correct partial resolution. The outstanding dependency and callback commitment are clearly documented for follow-up.'
+        },
+        triage: {
+          formName:'Patient Access - Symptom Routing Auto Evaluation', score:100, critical:'Pass', evaluator:'Genesys Auto Evaluation', status:'Released',
+          sections:[
+            {title:'Safety & routing', questions:[
+              {q:'Did the agent recognize symptom language that required clinical triage rather than routine scheduling?', a:'yes', auto:true},
+              {q:'Did the agent avoid providing clinical advice or making a clinical determination?', a:'yes', auto:true},
+              {q:'Did the agent route the interaction to the designated clinical resource?', a:'yes', auto:true}
+            ]},
+            {title:'Handoff quality', questions:[
+              {q:'Did the agent verify a callback number before transfer?', a:'yes', auto:true},
+              {q:'Did the agent pass the patient-reported symptom, onset, and worsening status to the receiving nurse?', a:'yes', auto:true},
+              {q:'Did the agent remain connected for a warm handoff instead of returning the patient to a general queue?', a:'yes', auto:true}
+            ]}
+          ], comment:'Critical routing behaviors were followed. The warm handoff preserved context and reduced the need for the patient to repeat information.'
+        }
+      };
+
+      function ensureQuality(obj, key) {
+        if (!obj.quality) obj.quality = deepClone(qualityTemplates[key] || qualityTemplates.referral);
+        return obj;
+      }
 
       const storagePrefix = 'interaction-demo:';
       let currentKey = 'referral';
@@ -949,26 +1082,36 @@
 
       function loadScenario(key) {
         try {
-          const saved = localStorage.getItem(storagePrefix + key);
-          if (saved) return JSON.parse(saved);
+          const saved = sessionStorage.getItem(storagePrefix + key);
+          if (saved) return ensureQuality(JSON.parse(saved), key);
         } catch (e) {}
-        return deepClone(templates[key] || templates.referral);
+        return ensureQuality(deepClone(templates[key] || templates.referral), key);
       }
 
       function saveScenario() {
         try {
-          localStorage.setItem(storagePrefix + currentKey, JSON.stringify(current));
-          $('#saveStatus').textContent = 'Saved';
-          toast('Scenario saved locally');
+          sessionStorage.setItem(storagePrefix + currentKey, JSON.stringify(current));
+          $('#saveStatus').textContent = 'Saved for this session';
+          toast('Scenario saved for this browser session');
         } catch (e) {
-          toast('Local save unavailable in this browser');
+          toast('Session save unavailable in this browser');
         }
       }
 
+
+      function persistSession() {
+        try {
+          sessionStorage.setItem(storagePrefix + currentKey, JSON.stringify(current));
+          const st=$('#saveStatus'); if(st) st.textContent='Saved for this session';
+        } catch(e) {}
+      }
+
       function resetScenario() {
-        try { localStorage.removeItem(storagePrefix + currentKey); } catch (e) {}
-        current = deepClone(templates[currentKey] || templates.referral);
+        try { sessionStorage.removeItem(storagePrefix + currentKey); } catch (e) {}
+        current = ensureQuality(deepClone(templates[currentKey] || templates.referral), currentKey);
         outlineOn = false;
+        sideTab = 'insights';
+        detailTab = 'transcript';
         playTime = 0;
         stopPlayback();
         renderAll();
@@ -1107,7 +1250,7 @@
           marker.removeEventListener('pointermove', move);
           marker.removeEventListener('pointerup', up);
           renderEvents();
-          $('#saveStatus').textContent = 'Unsaved changes';
+          $('#saveStatus').textContent = 'Saving…';
         };
         marker.addEventListener('pointermove', move);
         marker.addEventListener('pointerup', up);
@@ -1188,7 +1331,7 @@
           el.addEventListener('input', () => {
             const row = current.transcript.find(r => r.id === el.dataset.rowId);
             if (row) row.text = el.textContent;
-            $('#saveStatus').textContent = 'Unsaved changes';
+            $('#saveStatus').textContent = 'Saving…';
           });
         });
         $$('.row-time', scroller).forEach(input => input.addEventListener('change', () => {
@@ -1345,7 +1488,7 @@
             if (el.dataset.insightPath) current.insights[el.dataset.insightPath] = el.textContent;
             if (el.dataset.sentimentIndex != null) current.insights.sentiments[Number(el.dataset.sentimentIndex)][el.dataset.sentimentField] = el.textContent;
             if (el.dataset.agentIndex != null) current.insights.agentSummaries[Number(el.dataset.agentIndex)][el.dataset.agentField] = el.textContent;
-            $('#saveStatus').textContent = 'Unsaved changes';
+            $('#saveStatus').textContent = 'Saving…';
           });
         });
       }
@@ -1385,7 +1528,7 @@
             if (e.target.closest('.event-edit')) return;
             activateEvent(ev.id);
           });
-          $('.event-label-input',row).addEventListener('input', e => { ev.label=e.target.value; $('.event-label',row).textContent=ev.label; renderMarkers(); $('#saveStatus').textContent='Unsaved changes'; });
+          $('.event-label-input',row).addEventListener('input', e => { ev.label=e.target.value; $('.event-label',row).textContent=ev.label; renderMarkers(); $('#saveStatus').textContent='Saving…'; });
           $('.event-type-input',row).addEventListener('change', e => { ev.type=e.target.value; renderEvents(); renderTranscript(); renderMarkers(); });
           $('.event-time-input',row).addEventListener('change', e => { ev.time=Math.min(current.duration,parseTime(e.target.value)); renderEvents(); renderMarkers(); });
           $('.delete-event',row).addEventListener('click', () => { current.events=current.events.filter(x=>x.id!==ev.id); renderEvents(); renderMarkers(); renderTranscript(); });
@@ -1433,6 +1576,65 @@
         if (sideTab==='insights') renderInsights(); else renderEvents();
       }
 
+
+      function qualityScoreFromAnswers() {
+        const qs=(current.quality?.sections||[]).flatMap(s=>s.questions||[]);
+        if(!qs.length) return current.quality?.score || 0;
+        const scorable=qs.filter(q=>q.a!=='na');
+        if(!scorable.length) return 100;
+        return Math.round(scorable.filter(q=>q.a==='yes').length/scorable.length*100);
+      }
+
+      function renderQuality() {
+        current.quality = current.quality || deepClone(qualityTemplates[currentKey] || qualityTemplates.referral);
+        const q=current.quality;
+        q.score=qualityScoreFromAnswers();
+        const sections=(q.sections||[]).map((sec,si)=>{
+          const qs=sec.questions||[];
+          const secScore=qs.filter(x=>x.a!=='na').length ? Math.round(qs.filter(x=>x.a==='yes').length/qs.filter(x=>x.a!=='na').length*100) : 100;
+          return `<section class="quality-section" data-quality-section="${si}">
+            <div class="quality-section-head"><div class="quality-section-title">${si+1}. <span contenteditable="${editMode?'true':'false'}" data-q-section-title="${si}">${escapeHtml(sec.title)}</span></div><div class="quality-section-score">${secScore}%</div></div>
+            ${qs.map((item,qi)=>`<div class="quality-question">
+              <div><div class="q-title" contenteditable="${editMode?'true':'false'}" data-q-title="${si}:${qi}">${si+1}.${qi+1} ${escapeHtml(item.q)} ${item.auto?'<span class="auto-badge">✦ AI scored</span>':''}</div>${item.help?`<div class="q-help">${escapeHtml(item.help)}</div>`:''}</div>
+              <div class="answer-group" data-answer-group="${si}:${qi}">
+                <button class="answer-btn yes ${item.a==='yes'?'selected':''}" data-answer="yes" type="button">Yes</button>
+                <button class="answer-btn no ${item.a==='no'?'selected':''}" data-answer="no" type="button">No</button>
+                <button class="answer-btn na ${item.a==='na'?'selected':''}" data-answer="na" type="button">N/A</button>
+              </div>
+            </div>`).join('')}
+          </section>`;
+        }).join('');
+        return `<section class="quality-view" id="qualityView">
+          <aside class="quality-left">
+            <div class="quality-left-title">Evaluations</div>
+            <div class="evaluation-list-card">
+              <div class="eval-row active"><div class="eval-row-title">${escapeHtml(q.formName)}</div><div class="eval-row-meta">Auto Evaluation • ${escapeHtml(q.status)}<br>Assigned Oct 20, 2026</div><div class="eval-row-score"><span class="score-dot"></span><span>${q.score}%</span></div></div>
+            </div>
+          </aside>
+          <div class="quality-main">
+            <div class="quality-header"><div><h2 contenteditable="${editMode?'true':'false'}" data-quality-field="formName">${escapeHtml(q.formName)}</h2><div class="quality-sub">Agent: Jamie Rivera &nbsp; • &nbsp; Evaluator: <span contenteditable="${editMode?'true':'false'}" data-quality-field="evaluator">${escapeHtml(q.evaluator)}</span></div></div><div class="quality-header-actions"><span class="quality-pill">${escapeHtml(q.status)}</span></div></div>
+            <div class="quality-scoreboard"><div class="score-big"><div class="label">Score</div><div class="value">${q.score}%</div></div><div class="score-breakdown"><div class="score-breakdown-item"><div class="k">Critical Score</div><div class="v">${escapeHtml(q.critical)}</div></div><div class="score-breakdown-item"><div class="k">Evaluation Type</div><div class="v">Auto Evaluation</div></div><div class="score-breakdown-item"><div class="k">Agent Reviewed</div><div class="v">Not yet</div></div></div></div>
+            <div class="auto-score-strip"><span class="ai-score-icon">✦</span><div><strong>Automatically scored</strong><br><span class="quality-sub">Questions were scored from interaction content and detected behaviors.</span></div></div>
+            <div class="quality-form">${sections}<div class="quality-section"><div class="quality-comment-label">Evaluator comments</div><div class="quality-comment" contenteditable="${editMode?'true':'false'}" data-quality-field="comment">${escapeHtml(q.comment||'')}</div></div></div>
+          </div>
+        </section>`;
+      }
+
+      function bindQualityView() {
+        $$('[data-answer-group]').forEach(group=>group.addEventListener('click',e=>{
+          const btn=e.target.closest('[data-answer]'); if(!btn||!editMode) return;
+          const [si,qi]=group.dataset.answerGroup.split(':').map(Number);
+          current.quality.sections[si].questions[qi].a=btn.dataset.answer;
+          persistSession(); renderDetail();
+        }));
+        $$('[data-q-title]').forEach(el=>el.addEventListener('input',()=>{
+          const [si,qi]=el.dataset.qTitle.split(':').map(Number);
+          current.quality.sections[si].questions[qi].q=el.textContent.replace('✦ AI scored','').replace(/^\d+\.\d+\s*/,'').trim(); persistSession();
+        }));
+        $$('[data-q-section-title]').forEach(el=>el.addEventListener('input',()=>{current.quality.sections[Number(el.dataset.qSectionTitle)].title=el.textContent.trim();persistSession();}));
+        $$('[data-quality-field]').forEach(el=>el.addEventListener('input',()=>{current.quality[el.dataset.qualityField]=el.textContent.trim();persistSession();}));
+      }
+
       function renderDetail() {
         const container=$('#detailContent');
         $$('[data-detail-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.detailTab===detailTab));
@@ -1456,6 +1658,10 @@
             </aside>
           </section>`;
           bindTranscriptView();
+        } else if(detailTab==='quality') {
+          container.innerHTML=renderQuality();
+          bindQualityView();
+          renderEditableState();
         } else {
           const names={details:'Details',timeline:'Timeline',quality:'Quality Summary',audit:'Audit Trail',journeys:'Customer Journeys'};
           container.innerHTML=`<div class="placeholder"><h3>${names[detailTab]||'Interaction'}</h3><p>This demo replica focuses on the Transcript, AI Insights, Events, and recording timeline. This tab is intentionally lightweight so the navigation remains clickable without adding unrelated demo content.</p></div>`;
@@ -1491,7 +1697,7 @@
         const map={customerName:'customerName',customerPhone:'customerPhone',sentimentScore:'sentimentScore',sentimentTrend:'sentimentTrend',recordStart:'recordStart',recordEnd:'recordEnd'};
         Object.entries(map).forEach(([id,key])=>{
           const el=$('#'+id);
-          el.addEventListener('input',()=>{current[key]=el.textContent.trim();$('#saveStatus').textContent='Unsaved changes';});
+          el.addEventListener('input',()=>{current[key]=el.textContent.trim();$('#saveStatus').textContent='Saving…';});
         });
       }
 
@@ -1536,7 +1742,7 @@
       }
 
       function bindGlobal() {
-        $('#scenarioSelect').addEventListener('change',e=>{currentKey=e.target.value;current=loadScenario(currentKey);outlineOn=false;playTime=0;wavePage=0;stopPlayback();sideTab='insights';detailTab='transcript';filterState={topic:true,positive:true,negative:true,empathy:true,unhelpful:true,annotation:true};renderAll();$('#saveStatus').textContent='Template loaded';});
+        $('#scenarioSelect').addEventListener('change',e=>{currentKey=e.target.value;current=loadScenario(currentKey);outlineOn=false;playTime=0;wavePage=0;stopPlayback();sideTab='insights';detailTab='transcript';filterState={topic:true,positive:true,negative:true,empathy:true,unhelpful:true,annotation:true};renderAll();$('#saveStatus').textContent='Saved for this session';});
         $('#modeToggle').addEventListener('click',()=>setPresentation(editMode));
         $('#saveBtn').addEventListener('click',saveScenario);
         $('#resetBtn').addEventListener('click',resetScenario);
@@ -1566,6 +1772,7 @@
         });
       }
 
+      setInterval(()=>persistSession(), 900);
       initScenarioSelect();
       bindGlobal();
       syncHeaderEdits();
