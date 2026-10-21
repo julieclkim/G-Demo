@@ -6,7 +6,7 @@
   <title>Genesys Interaction Detail Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Roboto:wght@400;500;700&family=Urbanist:wght@600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --ink: #17243d;
@@ -66,7 +66,8 @@
     .demo-controls button.primary { background: #315ec4; border-color: #315ec4; color: #fff; }
     .demo-controls .spacer { flex: 1; }
     .demo-controls .status { color: #ccd4e4; font-size: 12px; min-width: 96px; text-align: right; }
-    .demo-controls .presentation-hint { color: #b7c0d0; font-size: 12px; }
+    .demo-controls #virtualAgentToggle { white-space:nowrap; }
+    .presentation-hint { color: #b7c0d0; font-size: 12px; }
 
     body.presentation .demo-controls { display: none; }
     body.presentation .edit-only { display: none !important; }
@@ -278,14 +279,14 @@
     html, body, button, input, select, textarea { font-family: "Roboto", Arial, sans-serif; }
     .app-shell { min-width: 1500px; }
     .topbar {
-      height: 72px;
+      height: 66px;
       padding: 0 18px;
       gap: 14px;
       border-top: 4px solid #344744;
       border-bottom: 1px solid #d9dde5;
     }
     .genesys-mark { display:none; }
-    .genesys-logo { width: 22px; height: 36px; object-fit: contain; flex: 0 0 auto; }
+    .genesys-logo { width: 22px; height: 30px; object-fit: contain; flex: 0 0 auto; }
     .menu-btn { height: 36px; min-width: 74px; padding:0 10px; border-color:#2352bb; border-radius:3px; font-weight:400; color:#23499f; }
     .menu-icon,.nav-icon,.participant-mini-icon,.participant-main-icon,.chevron-icon,.external-icon,.info-icon,.headset-avatar svg { fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .menu-icon { width:14px; height:14px; }
@@ -510,6 +511,212 @@
     body:not(.edit-mode) .quality-question .answer-btn { pointer-events:none; }
     body.edit-mode .q-title[contenteditable="true"], body.edit-mode .quality-comment[contenteditable="true"] { outline:1px dashed #7d98d3; outline-offset:2px; }
 
+
+    /* ============================================================
+       2026 Genesys Interaction Detail source-of-truth audit
+       Values below are aligned to the supplied SingleFile exports.
+       ============================================================ */
+    :root {
+      --ink:#2e394c;
+      --muted:#596373;
+      --line:#e2e6ee;
+      --soft:#f6f7f9;
+      --accent:#2a60c8;
+      --purple:#5d3d5e;
+      --green:#3c8527;
+      --red:#ea0b0b;
+      --participant:215px;
+      --sidebar:40%;
+    }
+    body { color:var(--ink); }
+    .ui-icon { width:1em; height:1em; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; display:block; }
+    .app-shell { min-width:1360px; }
+    .recording-area { padding:10px 16px; background:#fff; }
+    .participant-panel { width:215px; flex-basis:215px; }
+    .part-card { padding-left:16px; padding-right:16px; }
+    .participant-heading,.participant-heading-button { font-size:12px; line-height:16px; }
+    .internal-link,.external-value { font-size:14px; line-height:20px; }
+    .record-main { min-width:0; }
+    .record-meta { margin-left:10px; }
+    .meta-title { font-size:12px; line-height:16px; color:var(--muted); font-weight:700; }
+    .meta-value { font-size:14px; line-height:20px; }
+    .waveform { margin-top:30px; margin-bottom:10px; }
+    .annotation-row { margin-top:20px; gap:8px; }
+    .page-nav { height:41px; padding-top:20px; }
+
+    .interaction-view { grid-template-columns:minmax(0,68%) minmax(390px,32%); border:0; border-top:1px solid var(--line); min-height:600px; }
+    .transcript-pane { border-right:1px solid var(--line); }
+    .transcript-toolbar { height:52px; padding:0 16px; gap:8px; border-bottom:1px solid var(--line); }
+    .lock { width:21px; height:21px; display:grid; place-items:center; color:var(--accent); margin-left:0; }
+    .lock .ui-icon { width:19px; height:19px; }
+    .transcript-search { margin-left:4px; height:32px; max-width:75%; width:230px; }
+    .transcript-search input { font-size:14px; }
+    .ai-outline { margin-left:5px; margin-right:8px; padding-bottom:2px; gap:6px; font-size:13px; }
+    .mini-toggle { width:32px; height:16px; }
+    .mini-toggle::after { width:12px; height:12px; top:2px; left:2px; }
+    .mini-toggle.on::after { transform:translateX(16px); }
+    .tool-icon { width:31px; height:31px; color:var(--muted); display:grid; place-items:center; }
+    .tool-icon .ui-icon { width:21px; height:21px; }
+    .tool-icon.translate-tool { border-left:3px solid var(--line); width:45px; padding-left:12px; margin-left:5px; }
+    .tool-icon.translate-tool .ui-icon { width:26px; height:26px; }
+    .tool-icon:hover { color:#23478f; }
+
+    .transcript-scroller { min-height:548px; max-height:620px; }
+    .action-separator,.multi-actions { padding-left:20px; padding-right:20px; }
+    .action-chip { font-size:12px; line-height:18px; }
+    .transcript-entry { min-height:48px; grid-template-columns:58px 30px minmax(0,1fr); column-gap:8px; padding:8px 20px; font-size:14px; line-height:20px; }
+    .transcript-entry.customer { background:var(--soft); }
+    .ts { font-size:12px; line-height:20px; color:#445067; }
+    .speaker-icon { width:24px; height:24px; font-size:12px; border-radius:50%; }
+    .speaker-icon.bot { background:#eef1fb; color:#2143a2; border:1px solid #d5def7; border-radius:4px; }
+    .speaker-icon.bot .speaker-bot-svg { width:18px; height:18px; }
+    .customer-dot { width:8px; height:8px; background:#596373; border-radius:50%; display:block; }
+    .phrase { line-height:20px; color:#2e394c; }
+    .topic-badge { background:var(--purple); }
+    .event-inline.positive,.event-inline.empathy { background:var(--green); }
+    .event-inline.negative,.event-inline.unhelpful { background:var(--red); }
+
+    .sidepanel { border-left:0; min-width:0; }
+    .side-tabs { height:39px; display:flex; align-items:flex-start; gap:0; padding:0 8px; border-bottom:1px solid var(--line); }
+    .side-tab { width:max-content; margin:10px 5px 0; padding:0 5px 6px; border:0; border-bottom:4px solid transparent; background:none; color:#222529; font-size:14px; line-height:19px; font-weight:600; text-transform:capitalize; }
+    .side-tab.active { color:#222529; border-bottom-color:var(--accent); }
+    .side-scroll { height:561px; overflow:auto; padding:0 0 22px; }
+    .ai-label { display:inline-flex; align-items:center; gap:5px; margin:8px 0 0 14px; padding:0 10px; min-height:22px; border-radius:4px; background:linear-gradient(321deg,#d9d7ff,#c9fffb 92%); color:#2e394c; font-size:12px; line-height:18px; font-weight:700; }
+    .ai-label-icon { width:14px; height:14px; }
+    .virtual-agent { display:flex; align-items:center; gap:4px; margin:10px 14px 0; padding:0; background:transparent; color:var(--muted); font-size:13px; line-height:20px; }
+    .virtual-agent-icon { width:20px; height:20px; }
+    .ai-insights-wrapper { margin:8px 0 0 14px; padding:15px 10px; background:#f1f1f1; }
+    .insight-block { padding:0 0 14px; }
+    .summary-block { padding-bottom:16px; }
+    .insight-heading { display:flex; align-items:center; gap:5px; margin:0 0 2px; color:#2e394c; font-size:14px; line-height:20px; font-weight:700; }
+    .insight-spark { width:15px; height:15px; }
+    .insight-info { width:14px; height:14px; color:var(--muted); }
+    .insights-heading { margin-top:2px; margin-bottom:8px; }
+    .insight-subheading { margin:8px 0 2px; color:#2e394c; font-size:13px; line-height:20px; font-weight:700; }
+    .insight-text { color:#2e394c; font-size:13px; line-height:20px; }
+    .clamped { -webkit-line-clamp:3; }
+    .show-more { margin-top:2px; color:var(--accent); font-size:12px; line-height:18px; font-weight:700; }
+    .sentiment-item { padding:6px 0 7px; }
+    .sentiment-title { gap:4px; font-size:13px; line-height:20px; font-weight:700; }
+    .sentiment-icon { display:inline-flex; width:15px; height:15px; margin-top:1px; margin-right:4px; }
+    .sentiment-icon.positive { color:var(--green); }
+    .sentiment-icon.negative { color:var(--red); }
+    .sentiment-icon .ui-icon { width:15px; height:15px; }
+    .agent-summary-header { margin:12px 0 0 11px; }
+    .agent-summary-wrapper { margin:8px 0 0 13px; padding-right:12px; }
+    .agent-summary { border-top:1px solid var(--line); padding:8px 0; }
+    .agent-summary:first-child { border-top:0; }
+    .agent-summary details { border:0; }
+    .agent-summary summary { display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-size:13px; font-weight:700; }
+    .summary-chevron { color:var(--muted); }
+    .ai-generated { display:flex; align-items:center; gap:8px; margin-top:8px; padding:0; background:none; color:#2e394c; font-size:12px; line-height:18px; font-weight:700; }
+    .ai-generated-icon { width:16px; height:16px; }
+    .agent-summary-text { margin-top:8px; }
+
+    .event-filters { display:flex; flex-wrap:nowrap; gap:0; margin:0; padding:0 8px; overflow-x:auto; border-bottom:1px solid var(--line); }
+    .filter-btn { width:max-content; margin:5px; padding:0 5px 5px; border:0; border-bottom:4px solid transparent; background:none!important; color:#222529!important; border-radius:0; font-size:14px; line-height:20px; font-weight:400; }
+    .filter-btn:not(.off) { font-weight:700; }
+    .filter-btn.topics:not(.off) { border-bottom-color:var(--purple); }
+    .filter-btn.positive:not(.off) { border-bottom-color:var(--green); }
+    .filter-btn.negative:not(.off) { border-bottom-color:var(--red); }
+    .filter-btn.empathy:not(.off) { border-bottom-color:var(--green); }
+    .filter-btn.unhelpful:not(.off) { border-bottom-color:var(--red); }
+    .filter-btn.off { opacity:.55; }
+    .event-list { margin-top:0; padding-top:4px; }
+    .event-row { min-height:36px; display:grid; grid-template-columns:20px minmax(0,1fr) 60px; gap:0; padding:2px 10px 2px 20px; margin-right:10px; align-items:center; font-size:14px; }
+    .event-row:hover { background:var(--soft); }
+    .event-icon { min-width:20px; width:20px; height:20px; border-radius:50%; color:#fff; font-size:11px; }
+    .event-icon .ui-icon { width:14px; height:14px; }
+    .event-label { padding-left:10px; color:#2a60c7; font-size:14px; min-width:37px; }
+    .event-time { min-width:60px; padding-left:5px; text-align:right; color:#2e394c; font-size:13px; font-weight:600; }
+
+
+    .sidepanel { position:relative; padding-left:15px; margin-left:3px; }
+    .sidepanel::before { content:"›"; position:absolute; inset:0 auto 0 0; width:14px; display:flex; align-items:center; justify-content:center; border-left:2px solid var(--line); border-right:1px solid var(--line); background:#fff; color:#596373; font-size:12px; cursor:pointer; }
+    .virtual-agent { margin:0 0 10px; }
+    .summary-block .clamped { -webkit-line-clamp:3; }
+    .ai-insights-wrapper .insight-block:not(.summary-block) .clamped { -webkit-line-clamp:2; }
+
+    /* Quality Summary from the supplied quality.html. Open side panel = 40%. */
+    .quality-view { display:flex; min-height:590px; border-top:1px solid var(--line); background:#fff; }
+    .quality-summary-container { width:60%; min-width:0; padding:16px; overflow:hidden; }
+    .quality-page-title,.completed-surveys-title { margin:0 0 12px; color:#2e394c; font-size:18px; line-height:27px; font-weight:700; }
+    .quality-summary-evaluations { margin-top:0; }
+    .data-grid-tools { display:flex; gap:8px; flex-wrap:wrap; padding:10px 12px; border:1px solid var(--line); border-bottom:0; }
+    .quality-tool-btn { width:30px; height:30px; border:1px solid #b2b7c4; border-radius:4px; background:#fff; color:#4f5157; font-size:17px; cursor:pointer; }
+    .evaluation-table-wrap { overflow-x:auto; border:1px solid var(--line); }
+    .evaluation-summary-table { width:100%; min-width:1550px; border-collapse:collapse; table-layout:fixed; font-size:12px; color:#2e394c; }
+    .evaluation-summary-table th { height:38px; padding:0 10px; text-align:left; white-space:nowrap; background:#f5f6fa; border-right:1px solid var(--line); border-bottom:1px solid var(--line); font-weight:700; }
+    .evaluation-summary-table td { min-height:44px; padding:9px 10px; vertical-align:middle; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:#fff; line-height:18px; }
+    .evaluation-summary-table tbody tr:hover td,.evaluation-summary-table tbody tr.selected-evaluation td { background:#f6f7f9; }
+    .evaluation-summary-table th:nth-child(1),.evaluation-summary-table td:nth-child(1){width:41px;}
+    .evaluation-summary-table th:nth-child(2),.evaluation-summary-table td:nth-child(2){width:250px;}
+    .evaluation-summary-table th:nth-child(3),.evaluation-summary-table td:nth-child(3){width:204px;}
+    .evaluation-summary-table th:nth-child(4),.evaluation-summary-table td:nth-child(4){width:146px;}
+    .evaluation-summary-table th:nth-child(5),.evaluation-summary-table td:nth-child(5){width:90px;}
+    .evaluation-summary-table th:nth-child(6),.evaluation-summary-table td:nth-child(6){width:130px;}
+    .evaluation-summary-table th:nth-child(7),.evaluation-summary-table td:nth-child(7){width:103px;}
+    .evaluation-summary-table th:nth-child(8),.evaluation-summary-table td:nth-child(8){width:83px;}
+    .evaluation-summary-table th:nth-child(9),.evaluation-summary-table td:nth-child(9){width:75px;}
+    .evaluation-summary-table th:nth-child(10),.evaluation-summary-table td:nth-child(10){width:136px;}
+    .evaluation-summary-table th:nth-child(11),.evaluation-summary-table td:nth-child(11){width:160px;}
+    .evaluation-summary-table th:nth-child(12),.evaluation-summary-table td:nth-child(12){width:102px;}
+    .evaluation-summary-table th:nth-child(13),.evaluation-summary-table td:nth-child(13){width:162px;}
+    .evaluation-summary-table th:nth-child(14),.evaluation-summary-table td:nth-child(14){width:100px;}
+    .fake-check { display:block; width:14px; height:14px; border:1px solid #848891; border-radius:2px; background:#fff; }
+    .form-name-link { border:0; background:none; padding:0; color:#2a60c8; font:inherit; text-align:left; cursor:pointer; }
+    .quality-pagination { display:flex; align-items:center; justify-content:flex-end; gap:8px; height:44px; padding:0 10px; border:1px solid var(--line); border-top:0; font-size:12px; color:#596373; }
+    .quality-pagination button { min-width:28px; height:28px; border:0; border-radius:4px; background:#fff; color:#2e394c; }
+    .quality-pagination .current-page { background:#edf1fb; color:#2143a2; font-weight:700; }
+    .completed-surveys-title { margin-top:26px; }
+
+    .quality-side-panel { width:40%; flex-shrink:0; display:flex; flex-direction:column; background:#fdfdfd; border-left:1px solid #e4e9f0; font-family:"Noto Sans",Roboto,Arial,sans-serif; }
+    .quality-side-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:20px 24px 14px; border-bottom:1px solid var(--line); background:#fff; }
+    .quality-side-title-row { min-width:0; }
+    .quality-side-title-row h1 { display:inline; margin:0; color:#2a2a2e; font-family:Urbanist,Roboto,Arial,sans-serif; font-size:18px; line-height:27px; font-weight:700; }
+    .quality-status { display:inline-flex; align-items:center; gap:4px; margin-left:8px; padding:2px 8px; border-radius:12px; background:#e2f3ed; color:#056d4d; font-size:12px; line-height:18px; font-weight:700; vertical-align:2px; }
+    .quality-status .ui-icon { width:13px; height:13px; }
+    .quality-close { border:0; background:none; color:#4f5157; font-size:26px; line-height:26px; cursor:pointer; }
+    .quality-side-content { flex:1 1 auto; overflow:auto; }
+    .quality-metadata { padding:16px 24px 18px; border-bottom:1px solid var(--line); font-size:14px; line-height:20px; }
+    .quality-meta-row { display:flex; padding:3px 0; }
+    .metadata-label { display:inline-block; width:150px; padding-right:12px; color:#2e394c; font-weight:700; }
+    .metadata-value { color:#2e394c; }
+    .quality-score-row { display:flex; align-items:center; gap:10px; padding:14px 24px; border-bottom:1px solid var(--line); color:#2e394c; font-size:13px; }
+    .score-label,.critical-label { font-weight:700; }
+    .critical-label { margin-left:auto; }
+    .quality-score-tag { display:inline-flex; align-items:center; min-height:24px; padding:1px 8px; border-radius:4px; background:#d5def7; color:#102251; font-weight:700; }
+    .quality-form { max-height:none; padding:0 24px 28px; overflow:visible; }
+    .quality-section { padding:20px 0 12px; border-bottom:1px solid var(--line); }
+    .quality-section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; color:#2a2a2e; }
+    .quality-section-title { font-family:Urbanist,Roboto,Arial,sans-serif; font-size:16px; line-height:24px; font-weight:700; }
+    .section-number { margin-right:4px; }
+    .quality-section-score { font-size:13px; font-weight:700; }
+    .quality-question-list { margin:0 0 0 12px; padding:0; list-style-position:inside; counter-reset:item; }
+    .quality-question { position:relative; display:flex; gap:8px; margin:8px 0; padding:0; font-size:14px; line-height:20px; }
+    .quality-question::marker { font-weight:700; }
+    .quality-question-body { position:relative; flex:1; min-width:0; }
+    .q-title { color:#2e394c; font-size:14px; line-height:20px; }
+    .q-help { margin-top:4px; color:#596373; font-size:12px; line-height:18px; }
+    .auto-score-rail { position:absolute; left:-24px; top:30px; display:flex; align-items:center; justify-content:center; width:24px; height:28px; border-radius:4px 0 0 4px; background:linear-gradient(132.44deg,#bbe5e8 12.39%,#deeaff 72.24%); color:#203b73; }
+    .auto-score-rail .ui-icon { width:12px; height:12px; }
+    .answer-group { display:flex; align-items:center; gap:16px; margin-top:8px; }
+    .answer-btn { min-width:0; height:28px; display:inline-flex; align-items:center; gap:6px; padding:0; border:0; background:transparent!important; color:#2e394c!important; font-size:13px; cursor:pointer; }
+    .radio-dot { width:14px; height:14px; border:1.5px solid #848891; border-radius:50%; background:#fff; box-sizing:border-box; }
+    .answer-btn.selected .radio-dot { border:4px solid #2143a2; }
+    .answer-btn.selected { font-weight:700; }
+    .ai-answer-explanation { max-height:100px; overflow:auto; margin:4px 0 4px 24px; padding:12px; border:1px solid #e8ecf2; border-radius:4px; background:#fdfdfd; color:#4f5157; font-size:12px; line-height:18px; }
+    .ai-explanation-title { margin-bottom:4px; color:#2e394c; font-weight:700; }
+    .quality-comment-section { border-bottom:0; }
+    .quality-comment-label { margin-bottom:5px; color:#596373; font-size:12px; font-weight:700; }
+    .quality-comment { min-height:58px; padding:8px 10px; border:1px solid #c8ceda; border-radius:4px; color:#414b5d; background:#fff; font-size:13px; line-height:20px; }
+
+    @media (max-width:1500px) {
+      .interaction-view { grid-template-columns:minmax(0,68%) minmax(370px,32%); }
+      .quality-summary-container { width:60%; }
+      .quality-side-panel { width:40%; }
+    }
+
   </style>
 </head>
 <body class="edit-mode">
@@ -517,6 +724,7 @@
     <strong>Demo Builder</strong>
     <select id="scenarioSelect" aria-label="Scenario template"></select>
     <button id="modeToggle" class="primary" type="button">Presentation mode</button>
+    <button id="virtualAgentToggle" type="button">Hide virtual agent</button>
     <button id="saveBtn" type="button">Save locally</button>
     <button id="resetBtn" type="button">Reset template</button>
     <button id="exportBtn" type="button">Export JSON</button>
@@ -704,7 +912,7 @@
       const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
       const deepClone = obj => JSON.parse(JSON.stringify(obj));
       const pad2 = n => String(n).padStart(2, '0');
-      const fmtTime = sec => `${Math.floor(sec / 60)}:${pad2(Math.max(0, Math.round(sec % 60)))}`;
+      const fmtTime = sec => `${pad2(Math.floor(sec / 60))}:${pad2(Math.max(0, Math.round(sec % 60)))}`;
       const fmtLong = sec => `${Math.floor(sec / 60)}m ${pad2(Math.max(0, Math.round(sec % 60)))}s`;
       const parseTime = value => {
         const s = String(value || '').trim();
@@ -721,9 +929,11 @@
           interactionId: '71e6fbca-2765-4655-9ad9-4df968c4aa14',
           customerName: 'Carter, Elena', customerPhone: '+1 858-555-0184', sentimentScore: '+41', sentimentTrend: 'Improving',
           recordStart: 'Mon, October 19, 2026 at 10:14:08 AM', recordEnd: 'Mon, October 19, 2026 at 10:18:22 AM', duration: 254,
-          program: 'Patient Access Center - English', virtualAgent: false,
+          program: 'Patient Access Center - English', virtualAgent: true,
           transcript: [
-            {id:'r1',time:4,role:'ivr',speaker:'IVR',text:'Thank you for calling Northstar Health Patient Access.'},
+            {id:'r1',time:3,role:'ivr',speaker:'Virtual Agent',text:'Welcome to Northstar Health. Briefly tell me what you need help with today.'},
+            {id:'r1b',time:6,role:'customer',speaker:'Elena Carter',text:'I need to check a cardiology referral.'},
+            {id:'r1c',time:8,role:'ivr',speaker:'Virtual Agent',text:'I can help route that. I’ll connect you with Patient Access and pass along that you’re calling about a cardiology referral.'},
             {id:'r2',time:10,role:'agent',speaker:'Jamie',text:'Thank you for calling Patient Access. My name is Jamie. How can I help today?'},
             {id:'r3',time:22,role:'customer',speaker:'Elena Carter',text:'Hi. My primary care doctor sent a referral to cardiology last week, and I am trying to find out if you received it.'},
             {id:'r4',time:35,role:'agent',speaker:'Jamie',text:'I can check that for you. Let me verify your date of birth and the referring provider.'},
@@ -772,9 +982,11 @@
           interactionId: 'ce6949d0-2ed7-43a1-a680-46b89c80bb31',
           customerName: 'Martinez, Sofia', customerPhone: '+1 619-555-0129', sentimentScore: '+56', sentimentTrend: 'Improving',
           recordStart: 'Tue, October 20, 2026 at 9:02:14 AM', recordEnd: 'Tue, October 20, 2026 at 9:06:42 AM', duration: 268,
-          program: 'Patient Access Center - English', virtualAgent: false,
+          program: 'Patient Access Center - English', virtualAgent: true,
           transcript:[
-            {id:'n1',time:4,role:'ivr',speaker:'IVR',text:'Thank you for calling Northstar Health Patient Access.'},
+            {id:'n1',time:3,role:'ivr',speaker:'Virtual Agent',text:'Welcome to Northstar Health. What can I help you with today?'},
+            {id:'n1b',time:6,role:'customer',speaker:'Sofia Martinez',text:'I’m a new patient and need to find a primary care doctor.'},
+            {id:'n1c',time:9,role:'ivr',speaker:'Virtual Agent',text:'Got it. I’ll connect you with Patient Access and pass along that you’re looking to establish primary care.'},
             {id:'n2',time:11,role:'agent',speaker:'Riley',text:'Patient Access, this is Riley. How may I help you?'},
             {id:'n3',time:20,role:'customer',speaker:'Sofia Martinez',text:'I am new to the health system and need to establish care with a primary care doctor.'},
             {id:'n4',time:34,role:'agent',speaker:'Riley',text:'I can help with that. Are you looking for a particular location or provider preference?'},
@@ -817,10 +1029,13 @@
           interactionId: '40c7213f-5e42-44db-96b5-4d5fd14a2f88',
           customerName: 'Nguyen, Daniel', customerPhone: '+1 760-555-0170', sentimentScore: '+28', sentimentTrend: 'Improving',
           recordStart: 'Tue, October 20, 2026 at 11:31:05 AM', recordEnd: 'Tue, October 20, 2026 at 11:35:11 AM', duration: 246,
-          program: 'Patient Access Center - English', virtualAgent: false,
+          program: 'Patient Access Center - English', virtualAgent: true,
           transcript:[
-            {id:'s1',time:5,role:'agent',speaker:'Avery',text:'Thank you for calling Patient Access. This is Avery. How can I help?'},
-            {id:'s2',time:14,role:'customer',speaker:'Daniel Nguyen',text:'I need to move my neurology appointment. My ride canceled for Thursday.'},
+            {id:'s0',time:2,role:'ivr',speaker:'Virtual Agent',text:'Welcome to Northstar Health. What do you need help with today?'},
+            {id:'s0b',time:5,role:'customer',speaker:'Daniel Nguyen',text:'I need to reschedule a neurology appointment.'},
+            {id:'s0c',time:8,role:'ivr',speaker:'Virtual Agent',text:'I’ll connect you with Patient Access and pass along that you need to reschedule a neurology visit.'},
+            {id:'s1',time:11,role:'agent',speaker:'Avery',text:'Patient Access, this is Avery. I see you need help moving a neurology appointment. How can I help?'},
+            {id:'s2',time:14,role:'customer',speaker:'Daniel Nguyen',text:'My ride canceled for Thursday. I really need another time.'},
             {id:'s3',time:28,role:'agent',speaker:'Avery',text:'I can look for another time. Let me pull up the appointment first.'},
             {id:'s4',time:43,role:'customer',speaker:'Daniel Nguyen',text:'I really do not want to push it out another month. I have already been waiting a while.'},
             {id:'s5',time:58,role:'agent',speaker:'Avery',text:'I understand. I will check both your current clinic and the nearby location so we can minimize the delay.'},
@@ -863,9 +1078,12 @@
           interactionId: '0de7a642-b7fa-4f62-a43d-35d65d875422',
           customerName: 'Hill, Marcus', customerPhone: '+1 858-555-0162', sentimentScore: '-12', sentimentTrend: 'Stable',
           recordStart: 'Tue, October 20, 2026 at 1:08:48 PM', recordEnd: 'Tue, October 20, 2026 at 1:13:03 PM', duration: 255,
-          program: 'Patient Access Center - English', virtualAgent: false,
+          program: 'Patient Access Center - English', virtualAgent: true,
           transcript:[
-            {id:'a1',time:6,role:'agent',speaker:'Taylor',text:'Patient Access, this is Taylor. How can I help you today?'},
+            {id:'a0',time:2,role:'ivr',speaker:'Virtual Agent',text:'Welcome to Northstar Health. What can I help you with today?'},
+            {id:'a0b',time:5,role:'customer',speaker:'Marcus Hill',text:'I need to check whether my MRI was approved by insurance.'},
+            {id:'a0c',time:9,role:'ivr',speaker:'Virtual Agent',text:'Understood. I’ll connect you with Patient Access and pass along that you’re calling about MRI authorization status.'},
+            {id:'a1',time:12,role:'agent',speaker:'Taylor',text:'Patient Access, this is Taylor. I see you’re calling about an MRI authorization. Let me help with that.'},
             {id:'a2',time:16,role:'customer',speaker:'Marcus Hill',text:'I have an MRI on Thursday and I got a message that insurance approval might still be pending. I need to know if I should keep the appointment.'},
             {id:'a3',time:38,role:'agent',speaker:'Taylor',text:'I can check the authorization status and the appointment notes. One moment while I review both.'},
             {id:'a4',time:62,role:'agent',speaker:'Taylor',text:'The MRI authorization was submitted on Monday and is still pending with the health plan. There is not a denial on file.'},
@@ -908,9 +1126,12 @@
           interactionId: 'e616857b-52d8-43ab-90d7-259109f2a82e',
           customerName: 'Roberts, Maya', customerPhone: '+1 949-555-0136', sentimentScore: '+17', sentimentTrend: 'Improving',
           recordStart: 'Tue, October 20, 2026 at 2:21:31 PM', recordEnd: 'Tue, October 20, 2026 at 2:26:47 PM', duration: 316,
-          program: 'Patient Access Center - English', virtualAgent: false,
+          program: 'Patient Access Center - English', virtualAgent: true,
           transcript:[
-            {id:'t1',time:5,role:'agent',speaker:'Jordan',text:'Thank you for calling Northstar Health Patient Access. My name is Jordan. How can I help? '},
+            {id:'t0',time:2,role:'ivr',speaker:'Virtual Agent',text:'Welcome to Northstar Health. Briefly tell me what you need help with today.'},
+            {id:'t0b',time:5,role:'customer',speaker:'Maya Roberts',text:'I need a same-day appointment because I’m having chest tightness.'},
+            {id:'t0c',time:8,role:'ivr',speaker:'Virtual Agent',text:'I’ll connect you with Patient Access now and pass along what you shared.'},
+            {id:'t1',time:11,role:'agent',speaker:'Jordan',text:'Thank you for calling Northstar Health Patient Access. My name is Jordan. I see you’re calling about a same-day appointment. How can I help?'},
             {id:'t2',time:17,role:'customer',speaker:'Maya Roberts',text:'I was hoping to make an appointment today. I have been having chest tightness since this morning and it seems a little worse now.'},
             {id:'t3',time:36,role:'agent',speaker:'Jordan',text:'I can help get you to the right team. Because you are describing a new symptom that is getting worse, I need to connect you with our nurse triage line rather than schedule this as a routine visit.'},
             {id:'t4',time:59,role:'customer',speaker:'Maya Roberts',text:'Okay. I was not sure if I should just wait for an appointment.'},
@@ -1067,7 +1288,7 @@
         return obj;
       }
 
-      const storagePrefix = 'interaction-demo:';
+      const storagePrefix = 'interaction-demo:v3-audit:';
       let currentKey = 'referral';
       let current = loadScenario(currentKey);
       let editMode = true;
@@ -1291,6 +1512,7 @@
         scroller.appendChild(multi);
 
         current.transcript.forEach(row => {
+          if (!current.virtualAgent && row.role === 'ivr') return;
           if (query && !`${row.text} ${row.speaker} ${fmtTime(row.time)}`.toLowerCase().includes(query)) return;
           const rowEvents = eventsByTranscript.get(row.id) || [];
           const item = document.createElement('div');
@@ -1298,7 +1520,7 @@
           item.dataset.transcriptId = row.id;
           item.dataset.time = row.time;
           const iconClass = row.role === 'ivr' ? 'bot' : row.role === 'agent' ? 'agent' : '';
-          const initials = row.role === 'ivr' ? '▦' : row.role === 'agent' ? (row.speaker || 'A').slice(0,1).toUpperCase() : '◉';
+          const initials = row.role === 'ivr' ? uiIcon('bot','speaker-bot-svg') : row.role === 'agent' ? escapeHtml((row.speaker || 'A').slice(0,1).toUpperCase()) : '<span class="customer-dot"></span>';
           let eventIcons = '';
           rowEvents.forEach(ev => {
             if (ev.type === 'topic') {
@@ -1378,7 +1600,7 @@
 
         segments.forEach((seg, idx) => {
           const segEvents = current.events.filter(e => e.time >= seg.start && e.time <= Math.min(current.duration, seg.end));
-          const segRows = current.transcript.filter(r => r.time >= seg.start && r.time <= Math.min(current.duration, seg.end));
+          const segRows = current.transcript.filter(r => (current.virtualAgent || r.role !== 'ivr') && r.time >= seg.start && r.time <= Math.min(current.duration, seg.end));
           if (query && !(`${seg.title} ${seg.desc} ${segRows.map(r => r.text).join(' ')}`).toLowerCase().includes(query)) return;
           const topics = segEvents.filter(e => e.type === 'topic');
           const positive = segEvents.filter(e => e.type === 'positive').length;
@@ -1433,33 +1655,50 @@
       }
       function escapeAttr(value) { return escapeHtml(value).replace(/'/g,'&#39;'); }
 
+      function uiIcon(name, cls='') {
+        const paths = {
+          lock:'<rect x="5.25" y="8.25" width="13.5" height="11" rx="2"/><path d="M8 8.25V6.8a4 4 0 0 1 8 0v1.45"/>',
+          expand:'<path d="M14.5 4.5h5v5M19.5 4.5l-6 6M9.5 19.5h-5v-5M4.5 19.5l6-6"/>',
+          copy:'<rect x="8" y="8" width="11" height="11" rx="1.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>',
+          translate:'<path d="M4 5h8M8 3v2M6 5c.6 3.4 2.4 5.9 5.1 7.5M10.5 5c-.7 3.1-2.5 5.6-5.5 7.5M13.5 19l3.2-8 3.3 8M14.8 16h3.9"/>',
+          bot:'<path d="M12 3v2M8.5 5h7A3.5 3.5 0 0 1 19 8.5v6A3.5 3.5 0 0 1 15.5 18h-7A3.5 3.5 0 0 1 5 14.5v-6A3.5 3.5 0 0 1 8.5 5Z"/><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><path d="M9 14h6M3 10v4M21 10v4"/>',
+          sparkle:'<path d="m9 3 1.1 3.1L13 7.2l-2.9 1.1L9 11.5 7.9 8.3 5 7.2l2.9-1.1L9 3Z"/><path d="m16.5 9 1.5 4 3.8 1.5-3.8 1.5-1.5 4-1.5-4-3.8-1.5 3.8-1.5 1.5-4Z"/>',
+          info:'<circle cx="12" cy="12" r="8.5"/><path d="M12 10.5v5M12 7.7h.01"/>',
+          positive:'<circle cx="12" cy="12" r="8.5"/><path d="M8.5 13.5 11 11l2 2 3-3M16 10h-3v3"/>',
+          negative:'<circle cx="12" cy="12" r="8.5"/><path d="m8.5 10.5 2.5 2.5 2-2 3 3M16 14h-3v-3"/>'
+        };
+        return `<svg class="ui-icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${paths[name]||''}</svg>`;
+      }
+
       function renderInsights() {
         const p = $('#insightsPanel');
         const i = current.insights;
         p.innerHTML = `
-          <div class="ai-label">✦ AI Powered</div>
-          ${current.virtualAgent ? '<div class="virtual-agent">▦ A virtual agent participated in this interaction.</div>' : ''}
-          <div class="insight-block">
-            <div class="insight-heading">✦ Interaction Summary ⓘ</div>
-            <div class="insight-text clamped" data-expandable data-editable-insight="true" data-insight-path="summary">${escapeHtml(i.summary)}</div>
-            <button type="button" class="show-more" data-show-more>Show More</button>
+          <div class="ai-label">${uiIcon('sparkle','ai-label-icon')}<span>AI Powered</span></div>
+          <div class="ai-insights-wrapper">
+            ${current.virtualAgent ? `<div class="virtual-agent">${uiIcon('bot','virtual-agent-icon')}<span>A virtual agent participated in this interaction.</span></div>` : ''}
+            <div class="insight-block summary-block">
+              <div class="insight-heading">${uiIcon('sparkle','insight-spark')}<span>Interaction Summary</span>${uiIcon('info','insight-info')}</div>
+              <div class="insight-text clamped" data-expandable data-editable-insight="true" data-insight-path="summary">${escapeHtml(i.summary)}</div>
+              <button type="button" class="show-more" data-show-more>Show More</button>
+            </div>
+            <div class="insight-heading insights-heading">${uiIcon('sparkle','insight-spark')}<span>Insights</span></div>
+            ${insightSection('Reason for Contact','reasonTitle','reasonDesc')}
+            ${insightSection('Resolution','resolutionTitle','resolutionDesc')}
+            ${insightSection('Action Items','actionTitle','actionDesc')}
+            <div class="insight-block sentiment-block">
+              <div class="insight-subheading">Reason for Sentiment</div>
+              ${(i.sentiments||[]).map((s,idx)=>`
+                <div class="sentiment-item">
+                  <div class="sentiment-title"><span class="sentiment-icon ${s.type}">${uiIcon(s.type==='positive'?'positive':'negative')}</span><span data-editable-insight="true" data-sentiment-index="${idx}" data-sentiment-field="title">${escapeHtml(s.title)}</span></div>
+                  <div class="insight-text clamped" data-expandable data-editable-insight="true" data-sentiment-index="${idx}" data-sentiment-field="desc">${escapeHtml(s.desc)}</div>
+                  <button type="button" class="show-more" data-show-more>Show More</button>
+                </div>`).join('')}
+            </div>
           </div>
-          <div class="insight-heading">✦ Insights</div>
-          ${insightSection('Reason for Contact','reasonTitle','reasonDesc')}
-          ${insightSection('Resolution','resolutionTitle','resolutionDesc')}
-          ${insightSection('Action Items','actionTitle','actionDesc')}
-          <div class="insight-block">
-            <div class="insight-subheading">Reason for Sentiment</div>
-            ${(i.sentiments||[]).map((s,idx)=>`
-              <div class="sentiment-item">
-                <div class="sentiment-title"><span class="sentiment-dot ${s.type}">${s.type==='positive'?'▲':'▼'}</span><span data-editable-insight="true" data-sentiment-index="${idx}" data-sentiment-field="title">${escapeHtml(s.title)}</span></div>
-                <div class="insight-text clamped" data-expandable data-editable-insight="true" data-sentiment-index="${idx}" data-sentiment-field="desc">${escapeHtml(s.desc)}</div>
-                <button type="button" class="show-more" data-show-more>Show More</button>
-              </div>`).join('')}
-          </div>
-          <div class="agent-summary">
-            <div class="insight-heading">✦ Agent Summaries</div>
-            ${(i.agentSummaries||[]).map((a,idx)=>`<details ${idx===0?'open':''}><summary><span data-editable-insight="true" data-agent-index="${idx}" data-agent-field="name">${escapeHtml(a.name)}</span></summary><div class="ai-generated">✦ AI generated</div><div class="insight-text" style="margin-top:8px" data-editable-insight="true" data-agent-index="${idx}" data-agent-field="text">${escapeHtml(a.text)}</div></details>`).join('')}
+          <div class="agent-summary-header"><div class="insight-heading">${uiIcon('sparkle','insight-spark')}<span>Agent Summaries</span></div></div>
+          <div class="agent-summary-wrapper">
+            ${(i.agentSummaries||[]).map((a,idx)=>`<details ${idx===0?'open':''} class="agent-summary"><summary><span data-editable-insight="true" data-agent-index="${idx}" data-agent-field="name">${escapeHtml(a.name)}</span><span class="summary-chevron">⌄</span></summary><div class="ai-generated">${uiIcon('sparkle','ai-generated-icon')}<span>AI generated</span></div><div class="insight-text agent-summary-text" data-editable-insight="true" data-agent-index="${idx}" data-agent-field="text">${escapeHtml(a.text)}</div></details>`).join('')}
           </div>`;
         bindInsightEditing();
       }
@@ -1513,7 +1752,7 @@
           if (!filterState[ev.type]) return;
           const row = document.createElement('div');
           row.className = 'event-row'; row.dataset.eventId = ev.id;
-          const iconText = ev.type==='topic' ? topicIndex.get(ev.id) : ev.type==='positive'?'▲':ev.type==='negative'?'▼':ev.type==='empathy'?'♥':ev.type==='unhelpful'?'!':'•';
+          const iconText = ev.type==='topic' ? topicIndex.get(ev.id) : ev.type==='positive'?uiIcon('positive'):ev.type==='negative'?uiIcon('negative'):ev.type==='empathy'?'♡':ev.type==='unhelpful'?'!':'•';
           row.innerHTML = `
             <div class="event-icon ${ev.type}">${iconText}</div>
             <div class="event-label">${escapeHtml(ev.label)}</div>
@@ -1588,43 +1827,80 @@
       function renderQuality() {
         current.quality = current.quality || deepClone(qualityTemplates[currentKey] || qualityTemplates.referral);
         const q=current.quality;
-        q.score=qualityScoreFromAnswers();
         const sections=(q.sections||[]).map((sec,si)=>{
           const qs=sec.questions||[];
-          const secScore=qs.filter(x=>x.a!=='na').length ? Math.round(qs.filter(x=>x.a==='yes').length/qs.filter(x=>x.a!=='na').length*100) : 100;
+          const scored=qs.filter(x=>x.a!=='na');
+          const secScore=scored.length ? Math.round(scored.filter(x=>x.a==='yes').length/scored.length*100) : 100;
           return `<section class="quality-section" data-quality-section="${si}">
-            <div class="quality-section-head"><div class="quality-section-title">${si+1}. <span contenteditable="${editMode?'true':'false'}" data-q-section-title="${si}">${escapeHtml(sec.title)}</span></div><div class="quality-section-score">${secScore}%</div></div>
-            ${qs.map((item,qi)=>`<div class="quality-question">
-              <div><div class="q-title" contenteditable="${editMode?'true':'false'}" data-q-title="${si}:${qi}">${si+1}.${qi+1} ${escapeHtml(item.q)} ${item.auto?'<span class="auto-badge">✦ AI scored</span>':''}</div>${item.help?`<div class="q-help">${escapeHtml(item.help)}</div>`:''}</div>
-              <div class="answer-group" data-answer-group="${si}:${qi}">
-                <button class="answer-btn yes ${item.a==='yes'?'selected':''}" data-answer="yes" type="button">Yes</button>
-                <button class="answer-btn no ${item.a==='no'?'selected':''}" data-answer="no" type="button">No</button>
-                <button class="answer-btn na ${item.a==='na'?'selected':''}" data-answer="na" type="button">N/A</button>
+            <div class="quality-section-head"><div class="quality-section-title"><span class="section-number">${si+1}.</span> <span contenteditable="${editMode?'true':'false'}" data-q-section-title="${si}">${escapeHtml(sec.title)}</span></div><div class="quality-section-score">${secScore}%</div></div>
+            <ol class="quality-question-list">
+            ${qs.map((item,qi)=>`<li class="quality-question">
+              <div class="quality-question-body"><div class="q-title" contenteditable="${editMode?'true':'false'}" data-q-title="${si}:${qi}">${escapeHtml(item.q)}</div>${item.auto?`<span class="auto-score-rail" title="AI scored">${uiIcon('sparkle')}</span>`:''}${item.help?`<div class="q-help">${escapeHtml(item.help)}</div>`:''}
+                <div class="answer-group" data-answer-group="${si}:${qi}">
+                  <button class="answer-btn yes ${item.a==='yes'?'selected':''}" data-answer="yes" type="button"><span class="radio-dot"></span>Yes</button>
+                  <button class="answer-btn no ${item.a==='no'?'selected':''}" data-answer="no" type="button"><span class="radio-dot"></span>No</button>
+                  <button class="answer-btn na ${item.a==='na'?'selected':''}" data-answer="na" type="button"><span class="radio-dot"></span>N/A</button>
+                </div>
+                ${item.auto?`<div class="ai-answer-explanation"><div class="ai-explanation-title">AI scoring</div><div>${item.a==='yes'?'Interaction evidence supports this requirement.':item.a==='no'?'The interaction did not satisfy this requirement.':'This item was not applicable to the interaction.'}</div></div>`:''}
               </div>
-            </div>`).join('')}
+            </li>`).join('')}
+            </ol>
           </section>`;
         }).join('');
         return `<section class="quality-view" id="qualityView">
-          <aside class="quality-left">
-            <div class="quality-left-title">Evaluations</div>
-            <div class="evaluation-list-card">
-              <div class="eval-row active"><div class="eval-row-title">${escapeHtml(q.formName)}</div><div class="eval-row-meta">Auto Evaluation • ${escapeHtml(q.status)}<br>Assigned Oct 20, 2026</div><div class="eval-row-score"><span class="score-dot"></span><span>${q.score}%</span></div></div>
+          <div class="quality-summary-container">
+            <h2 class="quality-page-title">Evaluations</h2>
+            <div class="quality-summary-evaluations">
+              <div class="data-grid-tools"><button type="button" class="quality-tool-btn" title="Refresh">↻</button><button type="button" class="quality-tool-btn" title="More options">⋮</button></div>
+              <div class="evaluation-table-wrap">
+                <table class="evaluation-summary-table">
+                  <thead><tr><th class="check-col"><span class="fake-check"></span></th><th>Form Name</th><th>Evaluation Form Type</th><th>Assigned Date</th><th>Agent</th><th>Evaluator</th><th>Assignee</th><th>Status</th><th>Score</th><th>Critical Score</th><th>Agent Reviewed</th><th>Disputes</th><th>Agent Comment</th><th>Calibration</th></tr></thead>
+                  <tbody><tr class="selected-evaluation"><td><span class="fake-check"></span></td><td><button type="button" class="form-name-link">${escapeHtml(q.formName)}</button></td><td>Agent Auto-Evaluation Form</td><td>Tuesday, October 20, 2026 at 3:48 PM</td><td>Jamie Rivera</td><td>${escapeHtml(q.evaluator)}</td><td>N/A</td><td>Completed</td><td>${q.score}%</td><td>${escapeHtml(q.critical)}</td><td>No</td><td>-</td><td></td><td>No</td></tr></tbody>
+                </table>
+              </div>
+              <div class="quality-pagination"><span>1 - 1 of 1</span><button type="button" disabled>‹</button><button type="button" class="current-page">1</button><button type="button" disabled>›</button><span>25 per page</span></div>
+            </div>
+            <h2 class="completed-surveys-title">Completed Surveys</h2>
+          </div>
+          <aside class="quality-side-panel open" aria-label="${escapeAttr(q.formName)}">
+            <div class="quality-side-header">
+              <div class="quality-side-title-row"><h1 contenteditable="${editMode?'true':'false'}" data-quality-field="formName">${escapeHtml(q.formName)}</h1><span class="quality-status">${uiIcon('positive')}<span>Complete</span></span></div>
+              <button type="button" class="quality-close" aria-label="Close evaluation">×</button>
+            </div>
+            <div class="quality-side-content">
+              <div class="quality-metadata">
+                <div class="quality-meta-row"><span class="metadata-label">Agent</span><span class="metadata-value">Jamie Rivera</span></div>
+                <div class="quality-meta-row"><span class="metadata-label">Assignee</span><span class="metadata-value">N/A</span></div>
+                <div class="quality-meta-row"><span class="metadata-label">Evaluator</span><span class="metadata-value" contenteditable="${editMode?'true':'false'}" data-quality-field="evaluator">${escapeHtml(q.evaluator)}</span></div>
+                <div class="quality-meta-row"><span class="metadata-label">Created</span><span class="metadata-value">October 20, 2026 at 3:48 PM</span></div>
+              </div>
+              <div class="quality-score-row"><span class="score-label">Score</span><span class="quality-score-tag">${q.score}%</span><span class="critical-label">Critical Score</span><strong>${escapeHtml(q.critical)}</strong></div>
+              <div class="quality-form">${sections}<section class="quality-section quality-comment-section"><div class="quality-comment-label">Evaluator comments</div><div class="quality-comment" contenteditable="${editMode?'true':'false'}" data-quality-field="comment">${escapeHtml(q.comment||'')}</div></section></div>
             </div>
           </aside>
-          <div class="quality-main">
-            <div class="quality-header"><div><h2 contenteditable="${editMode?'true':'false'}" data-quality-field="formName">${escapeHtml(q.formName)}</h2><div class="quality-sub">Agent: Jamie Rivera &nbsp; • &nbsp; Evaluator: <span contenteditable="${editMode?'true':'false'}" data-quality-field="evaluator">${escapeHtml(q.evaluator)}</span></div></div><div class="quality-header-actions"><span class="quality-pill">${escapeHtml(q.status)}</span></div></div>
-            <div class="quality-scoreboard"><div class="score-big"><div class="label">Score</div><div class="value">${q.score}%</div></div><div class="score-breakdown"><div class="score-breakdown-item"><div class="k">Critical Score</div><div class="v">${escapeHtml(q.critical)}</div></div><div class="score-breakdown-item"><div class="k">Evaluation Type</div><div class="v">Auto Evaluation</div></div><div class="score-breakdown-item"><div class="k">Agent Reviewed</div><div class="v">Not yet</div></div></div></div>
-            <div class="auto-score-strip"><span class="ai-score-icon">✦</span><div><strong>Automatically scored</strong><br><span class="quality-sub">Questions were scored from interaction content and detected behaviors.</span></div></div>
-            <div class="quality-form">${sections}<div class="quality-section"><div class="quality-comment-label">Evaluator comments</div><div class="quality-comment" contenteditable="${editMode?'true':'false'}" data-quality-field="comment">${escapeHtml(q.comment||'')}</div></div></div>
-          </div>
         </section>`;
       }
 
       function bindQualityView() {
+        const closeBtn=$('.quality-close');
+        if(closeBtn) closeBtn.addEventListener('click',()=>{
+          const panel=$('.quality-side-panel');
+          const summary=$('.quality-summary-container');
+          if(panel) panel.classList.add('hidden');
+          if(summary) summary.style.width='100%';
+        });
+        const formLink=$('.form-name-link');
+        if(formLink) formLink.addEventListener('click',()=>{
+          const panel=$('.quality-side-panel');
+          const summary=$('.quality-summary-container');
+          if(panel) panel.classList.remove('hidden');
+          if(summary) summary.style.width='';
+        });
         $$('[data-answer-group]').forEach(group=>group.addEventListener('click',e=>{
           const btn=e.target.closest('[data-answer]'); if(!btn||!editMode) return;
           const [si,qi]=group.dataset.answerGroup.split(':').map(Number);
           current.quality.sections[si].questions[qi].a=btn.dataset.answer;
+          current.quality.score=qualityScoreFromAnswers();
           persistSession(); renderDetail();
         }));
         $$('[data-q-title]').forEach(el=>el.addEventListener('input',()=>{
@@ -1642,13 +1918,13 @@
           container.innerHTML=`<section class="interaction-view" id="transcriptView">
             <div class="transcript-pane">
               <div class="transcript-toolbar">
-                <span class="lock">♧</span>
+                <span class="lock">${uiIcon('lock')}</span>
                 <label class="transcript-search"><span class="search-icon"></span><input id="transcriptSearch" type="search" placeholder="Search" /></label>
                 <div class="toolbar-spacer"></div>
                 <div class="ai-outline"><button id="outlineToggle" class="mini-toggle ${outlineOn?'on':''}" type="button" aria-label="Toggle AI outline"></button><span>AI outline</span></div>
-                <button class="tool-icon" type="button" title="Expand transcript">↗</button>
-                <button class="tool-icon" type="button" title="Language tools">A▧</button>
-                <button class="tool-icon" id="copyTranscriptBtn" type="button" title="Copy transcript">▣</button>
+                <button class="tool-icon" type="button" title="Expand transcript">${uiIcon('expand')}</button>
+                <button class="tool-icon translate-tool" type="button" title="Language tools">${uiIcon('translate')}</button>
+                <button class="tool-icon" id="copyTranscriptBtn" type="button" title="Copy transcript">${uiIcon('copy')}</button>
               </div>
               <div class="transcript-scroller ${outlineOn?'':'outline-off'}" id="transcriptScroller"></div>
             </div>
@@ -1687,6 +1963,7 @@
       }
 
       function renderAll() {
+        const vaBtn=$('#virtualAgentToggle'); if(vaBtn) vaBtn.textContent=current.virtualAgent?'Hide virtual agent':'Show virtual agent';
         renderHeader();
         renderWaveform();
         renderDetail();
@@ -1744,6 +2021,7 @@
       function bindGlobal() {
         $('#scenarioSelect').addEventListener('change',e=>{currentKey=e.target.value;current=loadScenario(currentKey);outlineOn=false;playTime=0;wavePage=0;stopPlayback();sideTab='insights';detailTab='transcript';filterState={topic:true,positive:true,negative:true,empathy:true,unhelpful:true,annotation:true};renderAll();$('#saveStatus').textContent='Saved for this session';});
         $('#modeToggle').addEventListener('click',()=>setPresentation(editMode));
+        $('#virtualAgentToggle').addEventListener('click',()=>{current.virtualAgent=!current.virtualAgent;$('#virtualAgentToggle').textContent=current.virtualAgent?'Hide virtual agent':'Show virtual agent';persistSession();if(detailTab==='transcript')renderDetail();else renderEditableState();});
         $('#saveBtn').addEventListener('click',saveScenario);
         $('#resetBtn').addEventListener('click',resetScenario);
         $('#exportBtn').addEventListener('click',exportJson);
